@@ -24,7 +24,7 @@ export default function ModifiersItem({ modifier }: { modifier: Modifier }) {
                     ":hover": "none",
                     width: 17, height: 17
                 }}
-                onClick={() => removeModifier(modifier.id)}
+                onClick={() => removeModifier(modifier._id)}
             >
                 <RemoveIcon fontSize="inherit" />
             </IconButton>

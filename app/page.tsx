@@ -3,14 +3,19 @@ import Categories from "./widgets/categories";
 import Carousel from "./widgets/carousel";
 import PizzaCard from "./entities/pizza/pizza-card";
 
-
 interface Pizza {
-  id: string;
+  _id: string;
   title: string;
-  image: {
-    large: string;
-  };
+  image: { large: string };
   products: any[];
+}
+
+interface PizzaResponse {
+  pizzas: Pizza[];
+}
+
+interface CategoriesResponse {
+  categories: string[];
 }
 
 interface ItemsResponse {
@@ -19,36 +24,55 @@ interface ItemsResponse {
 }
 
 async function getPizzas(): Promise<ItemsResponse> {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pizzas`, {
-    cache: "no-store",
-  });
+  const [pizzasRes, categoriesRes] = await Promise.all([
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pizzas`, { cache: "no-store" }),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, { cache: "no-store" }),
+  ]);
 
-  if (!res.ok) {
-    throw new Error("Не вдалося завантажити піци");
+  if (!pizzasRes.ok || !categoriesRes.ok) {
+    throw new Error("Не вдалося завантажити піци або категорії");
   }
 
-  return res.json();
+  const [{ pizzas }, { categories }]: [PizzaResponse, CategoriesResponse] =
+    await Promise.all([pizzasRes.json(), categoriesRes.json()]);
+
+  return { pizzas, categories };
 }
 
 export default async function Home() {
-  const items = await getPizzas();
+  const { pizzas, categories } = await getPizzas();
+  if (!pizzas) {
+    return null
+  }
   return (
-    <div>
-      <Categories categories={items.categories} />
-      <Carousel />
+    <div className="mx-auto">
+      {/* Категорії */}
+      {/* <div className="mb-4">
+        <Categories categories={categories} />
+      </div> */}
+
+      {/* Слайдер */}
+      <div className="mb-8">
+        <Carousel />
+      </div>
+
+      {/* Сітка піц */}
       <Container maxWidth="xl">
-        <Grid container spacing={5}>
-          {items.pizzas.map((pizza) => (
-            <Grid key={pizza.id} size={{ xs: 12, sm: 6, md: 3 }}>
-              <PizzaCard
-                title={pizza.title}
-                products={pizza.products}
-                image={pizza.image}
-              />
-            </Grid>
-          ))}
+        <Grid container spacing={3} columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+          {(pizzas ?? [])
+            .filter((pizza) => pizza?.products?.length > 0) // <-- ключовий момент
+            .map((pizza) => (
+              <Grid
+                key={pizza._id}
+               size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                sx={{ display: "flex" }}
+              >
+                <PizzaCard title={pizza.title} products={pizza.products} />
+              </Grid>
+            ))}
         </Grid>
       </Container>
+
     </div>
   );
 }

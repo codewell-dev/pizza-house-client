@@ -1,6 +1,6 @@
 import { StateCreator } from "zustand"
 import { Product } from "@/types/product";
-import { Modifier } from "../entities/productId/modifiers-checkbox-list";
+import { Modifier } from "../entities/productId/modifiers-checkbox-list"; 
 
 type MyStore = CartSlice;
 
@@ -9,17 +9,15 @@ export interface CartSlice {
     totalCount: number;
     totalPrice: number;
 
-    // Модифікатори
     modifiers: Modifier[];
     addModifier: (modifier: Modifier) => void;
-    removeModifier: (id: number) => void;
+    removeModifier: (id: string) => void;
     clearModifiers: () => void;
 
     addProductToCart: (product: Product) => void;
     removeProductFromCart: (id: number) => void;
     clearCart: () => void;
 }
-
 
 export const createCartSlice: StateCreator<
     MyStore,
@@ -34,44 +32,54 @@ export const createCartSlice: StateCreator<
     totalCount: 0,
     totalPrice: 0,
 
-    // Додавання нового state
     modifiers: [],
-  addModifier: (modifier) => set((state) => {
-    const exists = state.modifiers.find(m => m.id === modifier.id);
-    if (exists) {
-        exists.count = (exists.count ?? 1) + 1;
-    } else {
-        state.modifiers.push({ ...modifier, count: 1 });
-    }
-}, false, 'cartSlice/addModifier'),
-
-removeModifier: (id) => set((state) => {
-    const index = state.modifiers.findIndex(m => m.id === id);
-    if (index !== -1) {
-        const item = state.modifiers[index];
-        if ((item.count ?? 1) > 1) {
-            item.count!--;
+    
+    addModifier: (modifier) => set((state) => {
+        const exists = state.modifiers.find(m => m._id === modifier._id); 
+        
+        if (exists) {
+            exists.count = (exists.count ?? 1) + 1;
         } else {
-            state.modifiers.splice(index, 1);
+            state.modifiers.push({ ...modifier, count: 1 }); 
         }
-    }
-}, false, 'cartSlice/removeModifier'),
+    }, false, 'cartSlice/addModifier'),
+
+    removeModifier: (id) => set((state) => {
+        const index = state.modifiers.findIndex(m => m._id === id); 
+
+        if (index !== -1) {
+            const item = state.modifiers[index];
+            
+            if ((item.count ?? 1) > 1) {
+                item.count!--;
+            } else {
+                state.modifiers.splice(index, 1);
+            }
+        }
+    }, false, 'cartSlice/removeModifier'),
 
     clearModifiers: () => set((state) => {
         state.modifiers = [];
     }, false, 'cartSlice/clearModifiers'),
 
     addProductToCart: (product) => set((state) => {
-        const productFromCart = state.cart.find((i: Product) => i.id == product.id)
-        if (productFromCart) {
-            productFromCart.count = (productFromCart.count || 0) + 1;
-            productFromCart.modifiers = state.modifiers
-        } else {
-            state.cart.push({ ...product, modifiers: state.modifiers, count: 1 })
-        }
+        
+        // Додаємо новий елемент до кошика з поточно обраними модифікаторами
+        state.cart.push({ 
+            ...product, 
+            modifiers: JSON.parse(JSON.stringify(state.modifiers)), 
+            count: 1 
+        });
 
+        // Очищаємо поточні модифікатори для наступного продукту
+        state.modifiers = []; 
+
+        // Оновлення лічильників
         state.totalCount = state.cart.reduce((acc, item) => acc + (item.count ?? 1), 0);
-        state.totalPrice = state.cart.reduce((acc, item) => acc + item.price * (item.count ?? 1), 0);
+        state.totalPrice = state.cart.reduce((acc, item) => {
+            const modifiersPrice = (item.modifiers || []).reduce((sum, mod) => sum + mod.price * (mod.count || 1), 0);
+            return acc + (item.price + modifiersPrice) * (item.count ?? 1);
+        }, 0);
     }, false, 'cartSlice/addProduct'),
 
     removeProductFromCart: (id) =>
@@ -84,14 +92,19 @@ removeModifier: (id) => set((state) => {
             } else {
                 state.cart = state.cart.filter((item) => item.id !== id);
             }
+            
+            // Оновлення лічильників
             state.totalCount = state.cart.reduce((acc, item) => acc + (item.count ?? 1), 0);
-            state.totalPrice = state.cart.reduce((acc, item) => acc + item.price * (item.count ?? 1), 0);
+            state.totalPrice = state.cart.reduce((acc, item) => {
+                const modifiersPrice = (item.modifiers || []).reduce((sum, mod) => sum + mod.price * (mod.count || 1), 0);
+                return acc + (item.price + modifiersPrice) * (item.count ?? 1);
+            }, 0);
         }, false, 'cartSlice/removeProduct'),
 
     clearCart: () => set((state) => {
         state.cart = [];
         state.totalCount = 0;
         state.totalPrice = 0;
-        state.modifiers = []; // опціонально очищати модифікатори при очищенні корзини
+        state.modifiers = []; 
     }, false, 'cartSlice/clearCart'),
 });

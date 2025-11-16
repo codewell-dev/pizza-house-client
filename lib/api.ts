@@ -2,7 +2,7 @@ import { config } from "@/app/config";
 import "server-only";
 
 export async function getPizzaId(id: string) {
-  const res = await fetch(config.url + `${id}.json`);
+  const res = await fetch(config.url + `/products/${id}`);
 
   return res.json();
 }

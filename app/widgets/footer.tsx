@@ -1,111 +1,112 @@
+"use client";
+
 import React from "react";
-import { Box, Container, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  Typography,
+  Stack,
+  IconButton,
+  Divider,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import TelegramIcon from "@mui/icons-material/Telegram";
 import { grey } from "@mui/material/colors";
-
+import Link from "next/link";
 
 export default function Footer() {
-  const data = [
-    {
-      id: 1,
-      title: "Головна",
-      link: "/",
-    },
-    {
-      id: 2,
-      title: "Ресторани",
-      link: "/",
-    },
-    {
-      id: 3,
-      title: "Відгуки",
-      link: "/",
-    },
-    {
-      id: 4,
-      title: "Акції",
-      link: "/",
-    },
-    {
-      id: 5,
-      title: "Новини",
-      link: "/",
-    },
-    {
-      id: 6,
-      title: "Бонусна програма",
-      link: "/",
-    },
-    {
-      id: 7,
-      title: "Умови доставки",
-      link: "/",
-    },
-    {
-      id: 8,
-      title: "Бенкети",
-      link: "/",
-    },
-    {
-      id: 9,
-      title: "Про компанію Pizza House",
-      link: "/",
-    },
-    {
-      id: 10,
-      title: "Вакансії",
-      link: "/",
-    },
-    {
-      id: 11,
-      title: "Зв'язок з Керівництвом",
-      link: "/",
-    },
-    {
-      id: 12,
-      title: "Оферта",
-      link: "/",
-    },
-    {
-      id: 13,
-      title: "Умови компанії",
-      link: "/",
-    },
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
+  const links = [
+    "Головна",
+    "Ресторани",
+    "Відгуки",
+    "Акції",
+    "Новини",
+    "Бонусна програма",
+    "Умови доставки",
+    "Бенкети",
+    "Про компанію Pizza House",
+    "Вакансії",
+    "Зв'язок з Керівництвом",
+    "Оферта",
+    "Умови компанії",
   ];
-  return <Box display="flex" justifyContent="space-between" bgcolor={grey[100]} p={3}>
-    <Container maxWidth="md">
-      <Box display="flex" justifyContent="space-between">
-        <Box>
-          {data.map(e => {
-            return <Typography key={e.id} component={"div"} sx={{ cursor: "pointer" }} mt={0.5} fontWeight={400}>
-              {e.title}
-            </Typography>
-          })}
-        </Box>
-        <Box>
-          <img src="https://pizzahouse.ua/_next/static/media/google_play.6ba3105b.svg" alt="google play" className="w-40 h-30" />
-          <img src="https://pizzahouse.ua/_next/static/media/app_store.79c3e27c.svg" alt="app store play" className="w-40 h-30 mt-2" />
-          <Box display="flex" mt={2} gap={1.5}>
-            <InstagramIcon
-              sx={{ width: 45, height: 45, cursor: "pointer" }}
-            />
-            <FacebookIcon
-              sx={{ width: 45, height: 45, cursor: "pointer" }}
-            />
-            <TelegramIcon
-              sx={{ width: 45, height: 45, cursor: "pointer" }}
-            />
-          </Box>
-        </Box>
 
-      </Box>
-      <Typography variant="subtitle2" textAlign="center">
-        Copyright
+  return (
+    <Box bgcolor={grey[100]} py={5} mt={6}>
+      <Container maxWidth="md">
+        <Stack
+          direction={isMobile ? "column" : "row"}
+          spacing={4}
+          justifyContent="space-between"
+          alignItems={isMobile ? "center" : "flex-start"}
+        >
+          {/* Колонка з посиланнями */}
+          <Stack spacing={1}>
+            {links.map((title, idx) => (
+              <Typography
+                key={idx}
+                component={Link}
+                href="/"
+                sx={{
+                  color: grey[800],
+                  textDecoration: "none",
+                  fontSize: 15,
+                  "&:hover": {
+                    color: theme.palette.primary.main,
+                  },
+                }}
+              >
+                {title}
+              </Typography>
+            ))}
+          </Stack>
 
-        © 2008-2023 Pizza House
-      </Typography>
-    </Container>
-  </Box>;
+          {/* Блок із магазинами та соцмережами */}
+          <Stack spacing={2} alignItems={isMobile ? "center" : "flex-end"}>
+            <Box>
+              <img
+                src="https://pizzahouse.ua/_next/static/media/google_play.6ba3105b.svg"
+                alt="Google Play"
+                style={{ width: 140, marginBottom: 8 }}
+              />
+              <img
+                src="https://pizzahouse.ua/_next/static/media/app_store.79c3e27c.svg"
+                alt="App Store"
+                style={{ width: 140 }}
+              />
+            </Box>
+
+            <Stack direction="row" spacing={1.5}>
+              <IconButton color="inherit">
+                <InstagramIcon sx={{ fontSize: 32 }} />
+              </IconButton>
+              <IconButton color="inherit">
+                <FacebookIcon sx={{ fontSize: 32 }} />
+              </IconButton>
+              <IconButton color="inherit">
+                <TelegramIcon sx={{ fontSize: 32 }} />
+              </IconButton>
+            </Stack>
+          </Stack>
+        </Stack>
+
+        <Divider sx={{ my: 3 }} />
+
+        <Typography
+          variant="body2"
+          color={grey[600]}
+          textAlign="center"
+          fontSize={13}
+        >
+          © 2008–2025 Pizza House. Усі права захищені.
+        </Typography>
+      </Container>
+    </Box>
+  );
 }

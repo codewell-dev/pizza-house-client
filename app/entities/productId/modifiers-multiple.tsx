@@ -47,11 +47,11 @@ export default function ModifiersMultiple({ e }: any) {
         >
             {e.modifiers.map((i: any) => {
                 // Знайдемо модифікатор у Zustand
-                const modifierInStore = selectedModifiers.find((m) => m.id === i.id);
+                const modifierInStore = selectedModifiers.find((m) => m._id === i._id);
                 const count = modifierInStore?.count ?? 0;
 
                 return (
-                    <div key={i.id}>
+                    <div key={i._id}>
                         <div className="flex justify-between items-center">
                             <div>
                                 <Typography component="span">{i.title}</Typography>

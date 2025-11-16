@@ -1,78 +1,92 @@
-"use client";
+// src/components/ModifiersCheckboxList.tsx
+
+'use client';
 
 import { useShopStore } from "@/app/providers/store-provider";
 import {
-  FormGroup,
-  FormControlLabel,
-  Checkbox,
-  Typography,
+    FormGroup,
+    FormControlLabel,
+    Checkbox,
+    Typography,
 } from "@mui/material";
-import { clear } from "console";
+// import { clear } from "console"; // ❌ Видалено зайвий імпорт
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+// ✅ Оновлений інтерфейс
 export interface Modifier {
-  id: number;
-  title: string;
-  price: number;
-  count?: number; // додаємо count
+    _id: string; // ✅ Змінено на _id: string
+    title: string;
+    price: number;
+    count?: number; 
 }
+
 interface ModifiersCheckboxListProps {
-  title: string;
-  modifiers: Modifier[];
-  productModifiers: Modifier[]; // якщо не потрібен — видалити
+    title: string;
+    modifiers: Modifier[];
+    groupId: string; // ✅ Додано ID групи
+    // productModifiers: Modifier[]; // ❌ Видалено, якщо не використовується
 }
 
 export default function ModifiersCheckboxList({
-  title,
-  modifiers,
+    title,
+    modifiers,
+    groupId, // ✅ Приймаємо ID групи
 }: ModifiersCheckboxListProps) {
-  const pathname = usePathname();
+    const pathname = usePathname();
 
-  const selectedModifiers = useShopStore((state) => state.modifiers);
-  const addModifier = useShopStore((state) => state.addModifier);
-  const removeModifier = useShopStore((state) => state.removeModifier);
-  const clearModifiers = useShopStore((state) => state.clearModifiers);
+    const selectedModifiers = useShopStore((state) => state.modifiers);
+    const addModifier = useShopStore((state) => state.addModifier);
+    const removeModifier = useShopStore((state) => state.removeModifier);
+    const clearModifiers = useShopStore((state) => state.clearModifiers);
 
-  useEffect(() => {
-    return () => {
-      clearModifiers();
+    useEffect(() => {
+        return () => {
+            clearModifiers();
+        };
+    }, [pathname]);
+
+    // 💡 Визначаємо, який модифікатор з поточної групи обраний
+    const selectedInGroup = selectedModifiers.find(
+        (m) => modifiers.some((mod) => mod._id === m._id)
+    );
+
+    // Перевіряє, чи модифікатор обраний
+    const isSelected = (modId: string) => selectedInGroup?._id === modId;
+
+    const handleToggle = (mod: Modifier) => {
+        // Якщо елемент, який вже обраний, клікнуто знову (знімаємо вибір)
+        if (isSelected(mod._id)) {
+            removeModifier(mod._id);
+        } else {
+            // ✅ ЛОГІКА ОДИНИЧНОГО ВИБОРУ
+            // 1. Видаляємо попередній обраний елемент з цієї групи
+            if (selectedInGroup) {
+                removeModifier(selectedInGroup._id); 
+            }
+            // 2. Додаємо новий елемент
+            addModifier(mod);
+        }
     };
-  }, [pathname]);
 
-/*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Check if a modifier is selected by id
-   * @param {number} modId modifier id
-   * @returns {boolean} true if modifier is selected
-   */
-/*******  799954ae-dd6d-4035-9010-b007a369ea07  *******/
-  const isSelected = (modId: number) =>
-    selectedModifiers.some((m) => m.id === modId);
-
-  const handleToggle = (mod: Modifier) => {
-    if (isSelected(mod.id)) {
-      removeModifier(mod.id);
-    } else {
-      addModifier(mod);
-    }
-  };
-
-  return (
-    <FormGroup sx={{ mt: 2 }}>
-      <Typography variant="subtitle1">{title}:</Typography>
-      {modifiers.map((mod) => (
-        <FormControlLabel
-          key={mod.id}
-          control={
-            <Checkbox
-              checked={isSelected(mod.id)}
-              onChange={() => handleToggle(mod)}
-            />
-          }
-          label={`${mod.title} +${mod.price} ₴`}
-        />
-      ))}
-    </FormGroup>
-  );
+    return (
+        <FormGroup sx={{ mt: 2 }}>
+            <Typography variant="subtitle1">{title}:</Typography>
+            {modifiers.map((mod) => (
+                <FormControlLabel
+                    key={mod._id}
+                    control={
+                        <Checkbox
+                            checked={isSelected(mod._id)}
+                            onChange={() => handleToggle(mod)}
+                            // Тут можна додати властивість name={groupId} для забезпечення 
+                            // RadioGroup-поведінки, якщо б використовувався Radio
+                        />
+                    }
+                    // ✅ Виправлено відображення ціни для 0
+                    label={`${mod.title}${mod.price > 0 ? ` +${mod.price} ₴` : ''}`} 
+                />
+            ))}
+        </FormGroup>
+    );
 }
