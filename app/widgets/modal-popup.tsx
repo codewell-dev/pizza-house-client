@@ -31,8 +31,7 @@ export default function ModalPopup() {
         sx={{
           fontWeight: 400,
           textTransform: "none",
-          fontSize: 16,
-          "&:hover": { color: theme.palette.secondary.main },
+          fontSize: 14,
         }}
         onClick={handleClickOpen}
       >

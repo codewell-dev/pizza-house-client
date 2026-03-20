@@ -8,7 +8,7 @@ export default function Carousel() {
     dots: true,
     infinite: true,
     speed: 500,
-    arrows: true, 
+    arrows: true,
     swipeToSlide: true,
     slidesToShow: 1,
     centerMode: true,
@@ -34,9 +34,7 @@ export default function Carousel() {
               <Image
                 src={src}
                 alt={`slide-${i}`}
-                width={800}
-                height={400}
-                className="w-full h-auto object-cover rounded-2xl"
+                className="object-cover rounded-2xl"
                 priority={i === 0}
               />
             </div>

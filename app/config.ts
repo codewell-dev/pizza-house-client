@@ -1,3 +1,3 @@
 export const config = {
-  url: "http://localhost:5000",
+  url: "https://6sv27l-5000.csb.app",
 };
