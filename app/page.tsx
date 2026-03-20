@@ -25,8 +25,12 @@ interface ItemsResponse {
 
 async function getPizzas(): Promise<ItemsResponse> {
   const [pizzasRes, categoriesRes] = await Promise.all([
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pizzas`, { cache: "no-store" }),
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, { cache: "no-store" }),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/pizzas`, {
+      cache: "no-store",
+    }),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/categories`, {
+      cache: "no-store",
+    }),
   ]);
 
   if (!pizzasRes.ok || !categoriesRes.ok) {
@@ -42,14 +46,14 @@ async function getPizzas(): Promise<ItemsResponse> {
 export default async function Home() {
   const { pizzas, categories } = await getPizzas();
   if (!pizzas) {
-    return null
+    return null;
   }
   return (
     <div className="mx-auto">
       {/* Категорії */}
-      {/* <div className="mb-4">
+      <div className="mb-4">
         <Categories categories={categories} />
-      </div> */}
+      </div>
 
       {/* Слайдер */}
       <div className="mb-8">
@@ -58,13 +62,17 @@ export default async function Home() {
 
       {/* Сітка піц */}
       <Container maxWidth="xl">
-        <Grid container spacing={3} columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+        <Grid
+          container
+          spacing={3}
+          columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}
+        >
           {(pizzas ?? [])
             .filter((pizza) => pizza?.products?.length > 0) // <-- ключовий момент
             .map((pizza) => (
               <Grid
                 key={pizza._id}
-               size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
                 sx={{ display: "flex" }}
               >
                 <PizzaCard title={pizza.title} products={pizza.products} />
@@ -72,7 +80,6 @@ export default async function Home() {
             ))}
         </Grid>
       </Container>
-
     </div>
   );
 }

@@ -18,7 +18,7 @@ interface Props {
 export default function Categories({ categories = [] }: Props) {
   return (
     <div className="w-full overflow-x-auto scrollbar-hide">
-      <div className="flex items-center gap-3 px-2 py-2 min-w-max">
+      <div className="flex items-center justify-center gap-3 px-2 py-2 min-w-max">
         {categories.map((cat) => (
           <Link
             key={cat.id}
@@ -38,7 +38,7 @@ export default function Categories({ categories = [] }: Props) {
                 className="object-contain"
               />
             </div>
-            <p className="text-[11px] mt-1 text-center text-gray-800 leading-tight">
+            <p className="text-[13px] mt-1 text-center text-gray-800 leading-tight">
               {cat.title}
             </p>
           </Link>

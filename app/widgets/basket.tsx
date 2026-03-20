@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import * as React from "react";
 import {
   Box,
@@ -47,7 +47,7 @@ export default function Basket() {
     <Stack
       spacing={2}
       sx={{
-        height: "100%",
+        height: "70vh",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -115,7 +115,7 @@ export default function Basket() {
         onClick={handleClick}
         sx={{
           borderRadius: 5,
-          py: 1,
+          py: 0.7,
           px: 2,
           display: "flex",
           alignItems: "center",
@@ -123,7 +123,7 @@ export default function Basket() {
           minWidth: isMobile ? 48 : "auto",
         }}
         variant="contained"
-        color={cartProducts.length > 0 ? "secondary" : "inherit"}
+        color={cartProducts.length > 0 ? "secondary" : "warning"}
         startIcon={<ShoppingCartIcon />}
       >
         {isMobile ? totalCount : `CART | ${totalCount} | $${totalPrice}`}
@@ -169,7 +169,12 @@ export default function Basket() {
             },
           }}
         >
-          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Box
+            display="flex"
+            justifyContent="space-between"
+            alignItems="center"
+            mb={2}
+          >
             <Typography variant="h6" fontWeight={600}>
               Кошик
             </Typography>

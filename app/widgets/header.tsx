@@ -44,7 +44,6 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
   return (
     <Box flexGrow={1}>
       <AppBar
@@ -52,8 +51,8 @@ export default function Header() {
         elevation={elevated ? 6 : 0}
         sx={{
           backgroundColor: elevated ? "#fff240ff" : "#FAE900",
-          transition: "all 0.25s ease",
-          zIndex: 1200
+
+          zIndex: 1200,
         }}
       >
         <Container maxWidth="xl">
@@ -166,7 +165,7 @@ export default function Header() {
         <Box mt={3}>
           <HeaderSelect title="ENG" links={["ENG", "RUS", "UKR"]} />
           <HeaderSelect
-            title="8-800-000-00-00"
+            title="Телефони"
             links={["38000000000", "18000000000", "87000000000"]}
           />
           <ModalPopup />
