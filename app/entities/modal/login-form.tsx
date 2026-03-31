@@ -1,16 +1,16 @@
-'use client';
-import React from 'react';
-import { Form, Formik } from 'formik';
-import { Box, Button, TextField, Stack } from '@mui/material';
-import * as Yup from 'yup';
+"use client";
+import React from "react";
+import { Form, Formik } from "formik";
+import { Box, Button, TextField, Stack } from "@mui/material";
+import * as Yup from "yup";
 
 const phoneRegExp = /^(\+?38)?0\d{9}$/;
 
 const validationSchema = Yup.object().shape({
   phone: Yup.string()
-    .matches(phoneRegExp, 'Будь-ласка, перевірте коректність номера телефону')
-    .required('Поле має бути заповнене'),
-  password: Yup.string().required('Пароль не має бути порожнім'),
+    .matches(phoneRegExp, "Будь-ласка, перевірте коректність номера телефону")
+    .required("Поле має бути заповнене"),
+  password: Yup.string().required("Пароль не має бути порожнім"),
 });
 
 const LoginForm = () => {
@@ -20,13 +20,13 @@ const LoginForm = () => {
 
   return (
     <Formik
-      initialValues={{ phone: '+380', password: '' }}
+      initialValues={{ phone: "+380", password: "" }}
       validationSchema={validationSchema}
       onSubmit={handleFormSubmit}
     >
       {({ handleSubmit, touched, errors, handleChange, handleBlur }) => (
         <Form onSubmit={handleSubmit}>
-          <Stack spacing={2}>
+          <Stack spacing={1}>
             <TextField
               label="Номер телефону"
               variant="outlined"
@@ -51,15 +51,15 @@ const LoginForm = () => {
               helperText={touched.password && errors.password}
             />
             <Stack
-              direction={{ xs: 'column', sm: 'row' }}
+              direction={{ xs: "column", sm: "row" }}
               spacing={2}
-              mt={1}
               justifyContent="space-between"
+              fontSize={12}
             >
-              <Button type="submit" variant="contained" fullWidth>
+              <Button type="submit" color="inherit" variant="text" fullWidth>
                 Увійти
               </Button>
-              <Button variant="text" fullWidth>
+              <Button variant="text" color="inherit" fullWidth>
                 Забули пароль?
               </Button>
             </Stack>

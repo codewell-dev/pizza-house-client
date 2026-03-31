@@ -9,7 +9,8 @@ interface PriceBoxProps {
 }
 
 export default function PriceBox({ product }: PriceBoxProps) {
-        const addProductToCart = useShopStore(state => state.addProductToCart)
+  console.log(product, "product");
+  const addProductToCart = useShopStore((state) => state.addProductToCart);
 
   return (
     <Box
@@ -20,12 +21,7 @@ export default function PriceBox({ product }: PriceBoxProps) {
       bgcolor={grey[100]}
       p={1.5}
     >
-      <Typography
-        variant="h5"
-        width="100%"
-        textAlign="center"
-        my="auto"
-      >
+      <Typography variant="h5" width="100%" textAlign="center" my="auto">
         {product.price} ₴
       </Typography>
       <Button

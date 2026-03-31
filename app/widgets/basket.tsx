@@ -47,7 +47,8 @@ export default function Basket() {
     <Stack
       spacing={2}
       sx={{
-        height: "70vh",
+        height: "100%",
+        backgroundColor: "red",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
@@ -141,7 +142,7 @@ export default function Basket() {
           PaperProps={{
             sx: {
               width: 400,
-              maxHeight: "80vh", // менше, ніж раніше
+              maxHeight: "90vh", // менше, ніж раніше
               borderRadius: 2,
               p: 2,
               display: "flex",

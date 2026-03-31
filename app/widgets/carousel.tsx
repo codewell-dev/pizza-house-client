@@ -3,6 +3,10 @@ import React from "react";
 import Slider from "react-slick";
 import Image from "next/image";
 
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import { Container } from "@mui/material";
+
 export default function Carousel() {
   const settings = {
     dots: true,
@@ -13,10 +17,19 @@ export default function Carousel() {
     slidesToShow: 1,
     centerMode: true,
     centerPadding: "16px",
-    adaptiveHeight: true,
     autoplay: true,
     autoplaySpeed: 4000,
     cssEase: "ease-in-out",
+
+    responsive: [
+      {
+        breakpoint: 768,
+        settings: {
+          centerMode: false,
+          centerPadding: "0px",
+        },
+      },
+    ],
   };
 
   const slides = [
@@ -26,21 +39,22 @@ export default function Carousel() {
   ];
 
   return (
-    <div className="w-full mt-6 overflow-hidden">
+    <Container maxWidth="xl">
       <Slider {...settings}>
         {slides.map((src, i) => (
           <div key={i} className="px-2">
-            <div className="rounded-2xl overflow-hidden shadow-md">
+            <div className="relative w-full h-[180px] sm:h-[250px] md:h-[320px] lg:h-[400px] rounded-2xl overflow-hidden shadow-md">
               <Image
                 src={src}
                 alt={`slide-${i}`}
-                className="object-cover rounded-2xl"
+                fill
+                className="object-cover"
                 priority={i === 0}
               />
             </div>
           </div>
         ))}
       </Slider>
-    </div>
+    </Container>
   );
 }

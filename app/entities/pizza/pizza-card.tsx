@@ -27,7 +27,6 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
 
   const changeActive = useCallback((index: number) => setActive(index), []);
 
-  /** 🛑 Якщо даних ще немає → показуємо Skeleton, а не падаємо */
   if (!currentProduct) {
     return (
       <Card sx={{ height: "100%", p: 2 }}>
@@ -62,7 +61,7 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
           sx={{
             marginInline: "auto",
             transition: "transform .25s ease",
-            "&:hover": { transform: "scale(1.05)" }
+            "&:hover": { transform: "scale(1.05)" },
           }}
         >
           <Image
@@ -107,7 +106,11 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
           </Typography>
         </Link>
 
-        <ProductVariants products={products} activeIndex={active} onChange={changeActive} />
+        <ProductVariants
+          products={products}
+          activeIndex={active}
+          onChange={changeActive}
+        />
       </CardContent>
 
       <CardActions

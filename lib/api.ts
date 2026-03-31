@@ -8,8 +8,7 @@ export async function getPizzaId(id: string) {
 }
 
 export async function getCategoryId(id: string) {
-  const res = await fetch(config.url + `${id}.json`);
+  const res = await fetch(config.url + `/${id}`);
 
   return res.json();
 }
-
