@@ -14,56 +14,89 @@ export default function CardBasket({ product }: CardBasketProps) {
   const removeProductFromCart = useShopStore(
     (state) => state.removeProductFromCart
   );
+
+  const basePrice = product.price * (product.count ?? 1);
+
   return (
     <Paper
       sx={{
         p: 2,
         display: "flex",
         gap: 2,
-        justifyContent: "center",
-        alignItems: "center",
+        alignItems: "flex-start",
       }}
     >
-      <Box>
-        <Box
-          sx={{
-            flexShrink: 0,
-            width: 112,
-            height: 112,
-            position: "relative",
-          }}
-        >
-          <Image
-            src={`https://pizzahouse.ua${product.image.large}`}
-            alt={product.title}
-            sizes="112px"
-            fill
-            style={{ objectFit: "contain" }}
-          />
-        </Box>
+      {/* IMAGE */}
+      <Box
+        sx={{
+          width: 100,
+          height: 100,
+          position: "relative",
+          flexShrink: 0,
+        }}
+      >
+        <Image
+          src={`https://pizzahouse.ua${product.image.large}`}
+          alt={product.title}
+          fill
+          style={{ objectFit: "contain" }}
+        />
       </Box>
-      <Box display="flex" justifyContent="space-between" width="100%">
+
+      {/* MAIN */}
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "1fr auto",
+          width: "100%",
+          gap: 1,
+        }}
+      >
+        {/* LEFT SIDE */}
         <Box>
-          <Typography variant="subtitle2">{product.title}</Typography>
-          <Typography variant="subtitle2" fontWeight={500}>
-            {`${product.price * (product.count ?? 1)} $`}
+          {/* TITLE */}
+          <Typography fontWeight={600}>{product.title}</Typography>
+          <br />
+          {/* PRICE */}
+          <Typography variant="body2" fontWeight={500} mt={0.5}>
+            {basePrice} ₴
           </Typography>
-          {product.modifiers.map((i, idx) => (
-            <Typography variant="span" key={idx}>
-              {i.title}
-            </Typography>
-          ))}
-          <Typography>{}</Typography>
-          {/* <Typography variant="span">{product.description}</Typography> */}
+
+          {/* MODIFIERS */}
+          {!!product.modifiers?.length && (
+            <Box mt={1}>
+              {product.modifiers.map((mod, idx) => (
+                <Box
+                  key={idx}
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr auto",
+                    fontSize: 13,
+                    color: "text.secondary",
+                    lineHeight: 1.4,
+                  }}
+                >
+                  <span>
+                    {mod.count > 1 ? `${mod.count}× ` : ""}
+                    {mod.title}
+                  </span>
+
+                  <span>+{mod.price * (mod.count ?? 1)} ₴</span>
+                </Box>
+              ))}
+            </Box>
+          )}
         </Box>
-        <Stack>
+
+        {/* RIGHT SIDE */}
+        <Box display="flex" alignItems="center">
           <Multiple
             countProduct={product.count ?? 1}
             reverse
             plusCount={() => addProductToCart(product)}
             minusCount={() => removeProductFromCart(product.cartItemId)}
           />
-        </Stack>
+        </Box>
       </Box>
     </Paper>
   );

@@ -39,7 +39,7 @@ export default function Footer() {
 
   return (
     <Box bgcolor={grey[100]} py={5} mt={6}>
-      <Container maxWidth="md">
+      <Container maxWidth="xl">
         <Stack
           direction={isMobile ? "column" : "row"}
           spacing={4}

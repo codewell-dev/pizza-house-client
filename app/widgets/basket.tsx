@@ -48,7 +48,6 @@ export default function Basket() {
       spacing={2}
       sx={{
         height: "100%",
-        backgroundColor: "red",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",

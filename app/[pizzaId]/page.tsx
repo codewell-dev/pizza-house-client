@@ -27,7 +27,6 @@ export default async function Page({ params }: Params) {
         alignItems="flex-start"
         justifyContent="center"
       >
-        
         {/* Картинка */}
         <Grid item xs={12} md={6} className="flex justify-center">
           <Box
@@ -35,7 +34,7 @@ export default async function Page({ params }: Params) {
               position: "relative",
               width: "100%",
               maxWidth: "400px",
-                height: { xs: "300px", sm: "350px", md: "500px" },
+              height: { xs: "300px", sm: "350px", md: "500px" },
             }}
           >
             <img
@@ -47,7 +46,13 @@ export default async function Page({ params }: Params) {
         </Grid>
 
         {/* Контент */}
-        <Grid item md={6} xs={12}  className="flex flex-col" sx={{maxWidth: "500px"}}>
+        <Grid
+          item
+          md={6}
+          xs={12}
+          className="flex flex-col"
+          sx={{ maxWidth: "500px" }}
+        >
           <Typography
             variant="h4"
             component="h1"
@@ -57,8 +62,8 @@ export default async function Page({ params }: Params) {
             {product.title}
           </Typography>
 
-          <Typography variant="subtitle1" color="text.secondary" gutterBottom>
-            {product.weight}
+          <Typography variant="h6" color="text.secondary" gutterBottom>
+            {product.weight} гр.
           </Typography>
 
           <Typography

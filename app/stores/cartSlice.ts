@@ -109,7 +109,6 @@ export const createCartSlice: StateCreator<
         );
 
         if (product.cartItemId) {
-          // 🔹 натиснули "+" у кошику
           const existingItem = state.cart.find(
             (item) => item.cartItemId === product.cartItemId
           );

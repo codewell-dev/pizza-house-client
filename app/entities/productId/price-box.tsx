@@ -9,8 +9,15 @@ interface PriceBoxProps {
 }
 
 export default function PriceBox({ product }: PriceBoxProps) {
-  console.log(product, "product");
+  const modifiers = useShopStore((state) => state.modifiers);
   const addProductToCart = useShopStore((state) => state.addProductToCart);
+
+  // рахуємо суму модифікаторів
+  const modifiersTotal = modifiers.reduce((sum, mod) => {
+    return sum + mod.price * (mod.count || 1);
+  }, 0);
+
+  const totalPrice = product.price + modifiersTotal;
 
   return (
     <Box
@@ -22,7 +29,7 @@ export default function PriceBox({ product }: PriceBoxProps) {
       p={1.5}
     >
       <Typography variant="h5" width="100%" textAlign="center" my="auto">
-        {product.price} ₴
+        {totalPrice} ₴
       </Typography>
       <Button
         variant="contained"
