@@ -8,7 +8,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { id } = await params;
   return { title: `Категорія: ${id}` };
 }
@@ -16,7 +18,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CategoryPage({ params }: PageProps) {
   const { id } = await params;
   const response = await getCategoryById(id);
-  const products: Product[] = response?.pageProps?.category?.category_products ?? [];
+  const products: Product[] =
+    response?.pageProps?.category?.category_products ?? [];
 
   if (products.length === 0) {
     return (

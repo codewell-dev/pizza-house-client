@@ -27,7 +27,9 @@ export async function generateStaticParams() {
 }
 
 // Dynamic metadata per product page for SEO
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   try {
     const { pizzaId } = await params;
     const product = await getPizzaById(pizzaId);
@@ -64,29 +66,29 @@ export default async function ProductPage({ params }: PageProps) {
         justifyContent="center"
       >
         {/* Product image — using Next.js Image for optimization */}
-       <Grid item xs={12} md={6} className="flex justify-center">
-  <Box
-    sx={{
-      width: "100%",
-      maxWidth: "400px",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-    }}
-  >
-    <Image
-      src={`https://pizzahouse.ua${product.image.large}`}
-      alt={product.image?.title ?? product.title}
-      width={400}
-      height={400}
-      style={{ objectFit: "contain", width: "100%", height: "auto" }}
-      priority
-    />
-  </Box>
-</Grid>
+        <Grid size={{ xs: 12, md: 6 }} className="flex justify-center">
+          <Box
+            sx={{
+              width: "100%",
+              maxWidth: "400px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Image
+              src={`https://pizzahouse.ua${product.image.large}`}
+              alt={product.image?.title ?? product.title}
+              width={400}
+              height={400}
+              style={{ objectFit: "contain", width: "100%", height: "auto" }}
+              priority
+            />
+          </Box>
+        </Grid>
 
         {/* Product details */}
-        <Grid item md={6} xs={12} sx={{ maxWidth: "500px" }}>
+        <Grid size={{ xs: 12, md: 6 }} sx={{ maxWidth: "500px" }}>
           <Typography
             variant="h4"
             component="h1"
