@@ -25,10 +25,6 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto">
-      <div className="mb-4">
-        <Categories categories={categories} />
-      </div>
-
       <div className="mb-8">
         <Carousel />
       </div>
@@ -38,16 +34,28 @@ export default async function HomePage() {
           fallback={
             <Grid container spacing={3}>
               {Array.from({ length: 8 }).map((_, i) => (
-                <Grid key={i} size={{ xs: 12, sm: 6, md: 4, lg: 3 }} sx={{ display: "flex" }}>
+                <Grid
+                  key={i}
+                  size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                  sx={{ display: "flex" }}
+                >
                   <PizzaCardSkeleton />
                 </Grid>
               ))}
             </Grid>
           }
         >
-          <Grid container spacing={3} columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+          <Grid
+            container
+            spacing={3}
+            columns={{ xs: 12, sm: 12, md: 12, lg: 12 }}
+          >
             {visiblePizzas.map((pizza: Pizza) => (
-              <Grid key={pizza._id} size={{ xs: 12, sm: 6, md: 4, lg: 3 }} sx={{ display: "flex" }}>
+              <Grid
+                key={pizza._id}
+                size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+                sx={{ display: "flex" }}
+              >
                 <PizzaCard title={pizza.title} products={pizza.products} />
               </Grid>
             ))}

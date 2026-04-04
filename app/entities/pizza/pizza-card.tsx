@@ -26,7 +26,10 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
   const addProductToCart = useShopStore((state) => state.addProductToCart);
 
   const currentProduct = products?.[activeIndex];
-  const handleVariantChange = useCallback((index: number) => setActiveIndex(index), []);
+  const handleVariantChange = useCallback(
+    (index: number) => setActiveIndex(index),
+    []
+  );
 
   if (!currentProduct) {
     return (
@@ -114,7 +117,9 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         />
       </CardContent>
 
-      <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 2, pb: 2 }}>
+      <CardActions
+        sx={{ display: "flex", justifyContent: "space-between", px: 2, pb: 2 }}
+      >
         <Typography variant="h6">{currentProduct.price} ₴</Typography>
 
         <Button

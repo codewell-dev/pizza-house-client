@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["ykj7fs-3000.csb.app"],
   images: {
     remotePatterns: [
       {

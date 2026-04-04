@@ -78,7 +78,7 @@ export default async function ProductPage({ params }: PageProps) {
           >
             <Image
               src={`https://pizzahouse.ua${product.image.large}`}
-              alt={product.image?.title ?? product.title}
+              alt={product.title}
               width={400}
               height={400}
               style={{ objectFit: "contain", width: "100%", height: "auto" }}
@@ -93,7 +93,7 @@ export default async function ProductPage({ params }: PageProps) {
             variant="h4"
             component="h1"
             sx={{ fontSize: { xs: "1.75rem", sm: "2.2rem", md: "2.5rem" } }}
-            gutterBottom
+            gutterBottomF
           >
             {product.title}
           </Typography>
