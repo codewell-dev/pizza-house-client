@@ -46,6 +46,7 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         flexDirection: "column",
         justifyContent: "space-between",
         borderRadius: 3,
+        width: "100%",
         overflow: "hidden",
         height: "100%",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",

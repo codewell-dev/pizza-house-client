@@ -73,10 +73,8 @@ export default function Header() {
                   alt="Logo"
                 />
               </Link>
-
+              <HeaderMenu />
               {!isMobile && (
-                <>
-                  <HeaderMenu />
                   <Button
                     variant="contained"
                     color="secondary"
@@ -85,33 +83,43 @@ export default function Header() {
                   >
                     Акція
                   </Button>
-                </>
               )}
             </Box>
 
             {/* RIGHT SIDE */}
-            {!isMobile ? (
-              <Box display="flex" alignItems="center" gap={1}>
-                <HeaderSelect title="ENG" links={["ENG", "RUS", "UKR"]} />
+            {/* {!isMobile ? ( */}
+            <Box display="flex" alignItems="center" gap={1}>
+              {!isMobile ?
+              <>
+               <HeaderSelect title="ENG" links={["ENG", "RUS", "UKR"]} />
+               <HeaderSelect
+                title=""
+                links={["38000000000", "18000000000", "87000000000"]}
+              />
+               </>
+               : (
                 <HeaderSelect
-                  title="8-800-000-00-00"
-                  links={["38000000000", "18000000000", "87000000000"]}
-                />
-                <ModalPopup />
-                <Basket />
-              </Box>
-            ) : (
+                title="8-800-000-00-00"
+                links={["38000000000", "18000000000", "87000000000"]}
+              />
+               )
+               }
+             
+              <ModalPopup />
+              <Basket />
+            </Box>
+            {/* ) : (
               <IconButton color="inherit" onClick={toggleDrawer(true)}>
                 <MenuIcon />
               </IconButton>
-            )}
+            )} */}
           </Toolbar>
         </Container>
       </AppBar>
 
-      <Box height="80px" />
+      {/* <Box height="80px" />
       {/* MOBILE DRAWER MENU */}
-      <Drawer
+      {/* <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
@@ -171,7 +179,7 @@ export default function Header() {
           <ModalPopup />
           <Basket />
         </Box>
-      </Drawer>
+      </Drawer>  */}
     </Box>
   );
 }
