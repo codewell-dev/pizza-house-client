@@ -1,8 +1,15 @@
 import { StateCreator } from "zustand";
 import { Product } from "@/types/product";
-import { Modifier } from "../entities/productId/modifiers-checkbox-list";
+import { Modifier } from "@/types/product";
 
 type MyStore = CartSlice;
+
+export interface ProductWithCartId extends Product {
+  cartItemId: string;
+  count: number;
+  modifiers: Modifier[];
+  price: number;
+}
 
 export interface CartSlice {
   cart: ProductWithCartId[];
@@ -19,37 +26,23 @@ export interface CartSlice {
   clearCart: () => void;
 }
 
-// Додаткове поле для унікального id у кошику
-export interface ProductWithCartId extends Product {
-  cartItemId: string;
-  count: number;
-  modifiers: Modifier[];
-  price: number; // ціна продукту з модифікаторами
-}
-
-// 🔥 helper: порівняння модифікаторів
-const isSameModifiers = (a: Modifier[] = [], b: Modifier[] = []) => {
+const isSameModifiers = (a: Modifier[] = [], b: Modifier[] = []): boolean => {
   if (a.length !== b.length) return false;
   const normalize = (mods: Modifier[]) =>
-    mods
-      .map((m) => `${m._id}:${m.count ?? 1}`)
-      .sort()
-      .join("|");
+    mods.map((m) => `${m._id}:${m.count ?? 1}`).sort().join("|");
   return normalize(a) === normalize(b);
 };
 
-// 🔥 helper: сума модифікаторів
-const getModifiersPrice = (modifiers: Modifier[] = []) => {
-  return modifiers.reduce(
-    (sum, mod) => sum + Number(mod.price ?? 0) * (mod.count ?? 1),
-    0
-  );
-};
+const getModifiersPrice = (modifiers: Modifier[] = []): number =>
+  modifiers.reduce((sum, mod) => sum + Number(mod.price ?? 0) * (mod.count ?? 1), 0);
 
-// 🔥 helper: загальна ціна продукту з модифікаторами
-const getItemTotalPrice = (product: Product, modifiers: Modifier[]) => {
-  return Number(product.price ?? 0) + getModifiersPrice(modifiers);
-};
+const getItemTotalPrice = (product: Product, modifiers: Modifier[]): number =>
+  Number(product.price ?? 0) + getModifiersPrice(modifiers);
+
+const recalcTotals = (cart: ProductWithCartId[]) => ({
+  totalCount: cart.reduce((acc, item) => acc + (item.count ?? 1), 0),
+  totalPrice: cart.reduce((acc, item) => acc + (item.price ?? 0) * (item.count ?? 1), 0),
+});
 
 export const createCartSlice: StateCreator<
   MyStore,
@@ -65,15 +58,15 @@ export const createCartSlice: StateCreator<
   addModifier: (modifier) =>
     set(
       (state) => {
-        const exists = state.modifiers.find((m) => m._id === modifier._id);
-        if (exists) {
-          exists.count = (exists.count ?? 1) + 1;
+        const existing = state.modifiers.find((m) => m._id === modifier._id);
+        if (existing) {
+          existing.count = (existing.count ?? 1) + 1;
         } else {
           state.modifiers.push({ ...modifier, count: 1 });
         }
       },
       false,
-      "cartSlice/addModifier"
+      "cart/addModifier"
     ),
 
   removeModifier: (id) =>
@@ -89,52 +82,35 @@ export const createCartSlice: StateCreator<
         }
       },
       false,
-      "cartSlice/removeModifier"
+      "cart/removeModifier"
     ),
 
   clearModifiers: () =>
-    set(
-      (state) => {
-        state.modifiers = [];
-      },
-      false,
-      "cartSlice/clearModifiers"
-    ),
+    set((state) => { state.modifiers = []; }, false, "cart/clearModifiers"),
 
   addProductToCart: (product) =>
     set(
       (state) => {
-        const currentModifiers: Modifier[] = JSON.parse(
-          JSON.stringify(state.modifiers)
-        );
+        const currentModifiers: Modifier[] = JSON.parse(JSON.stringify(state.modifiers));
 
         if (product.cartItemId) {
-          const existingItem = state.cart.find(
-            (item) => item.cartItemId === product.cartItemId
-          );
-          if (existingItem) {
-            existingItem.count++;
-            existingItem.price = getItemTotalPrice(
-              product,
-              existingItem.modifiers
-            );
+          const existing = state.cart.find((item) => item.cartItemId === product.cartItemId);
+          if (existing) {
+            existing.count++;
+            existing.price = getItemTotalPrice(product, existing.modifiers);
           }
         } else {
-          // 🔹 стандартне додавання продукту
-          const existingItem = state.cart.find(
-            (item) =>
-              item._id === product._id &&
-              isSameModifiers(item.modifiers, currentModifiers)
+          const existing = state.cart.find(
+            (item) => item._id === product._id && isSameModifiers(item.modifiers, currentModifiers)
           );
 
-          if (existingItem) {
-            existingItem.count++;
-            existingItem.price = getItemTotalPrice(product, currentModifiers);
+          if (existing) {
+            existing.count++;
+            existing.price = getItemTotalPrice(product, currentModifiers);
           } else {
-            const newCartItemId = crypto.randomUUID();
             state.cart.push({
               ...product,
-              cartItemId: newCartItemId,
+              cartItemId: crypto.randomUUID(),
               count: 1,
               modifiers: currentModifiers,
               price: getItemTotalPrice(product, currentModifiers),
@@ -143,48 +119,32 @@ export const createCartSlice: StateCreator<
         }
 
         state.modifiers = [];
-
-        // оновлюємо totals
-        state.totalCount = state.cart.reduce(
-          (acc, item) => acc + (item.count ?? 1),
-          0
-        );
-        state.totalPrice = state.cart.reduce(
-          (acc, item) => acc + (item.price ?? 0) * (item.count ?? 1),
-          0
-        );
+        const totals = recalcTotals(state.cart);
+        state.totalCount = totals.totalCount;
+        state.totalPrice = totals.totalPrice;
       },
       false,
-      "cartSlice/addProduct"
+      "cart/addProduct"
     ),
 
   removeProductFromCart: (cartItemId) =>
     set(
       (state) => {
-        const item = state.cart.find((item) => item.cartItemId === cartItemId);
+        const item = state.cart.find((i) => i.cartItemId === cartItemId);
         if (!item) return;
 
         if ((item.count ?? 1) > 1) {
-          // 🔹 зменшуємо count на 1
           item.count!--;
         } else {
-          // 🔹 видаляємо продукт повністю
-          state.cart = state.cart.filter(
-            (item) => item.cartItemId !== cartItemId
-          );
+          state.cart = state.cart.filter((i) => i.cartItemId !== cartItemId);
         }
 
-        state.totalCount = state.cart.reduce(
-          (acc, item) => acc + (item.count ?? 1),
-          0
-        );
-        state.totalPrice = state.cart.reduce(
-          (acc, item) => acc + (item.price ?? 0) * (item.count ?? 1),
-          0
-        );
+        const totals = recalcTotals(state.cart);
+        state.totalCount = totals.totalCount;
+        state.totalPrice = totals.totalPrice;
       },
       false,
-      "cartSlice/removeProduct"
+      "cart/removeProduct"
     ),
 
   clearCart: () =>
@@ -196,6 +156,6 @@ export const createCartSlice: StateCreator<
         state.modifiers = [];
       },
       false,
-      "cartSlice/clearCart"
+      "cart/clearCart"
     ),
 });

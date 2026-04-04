@@ -1,4 +1,5 @@
 "use client";
+
 import * as React from "react";
 import {
   Box,
@@ -16,6 +17,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import CardBasket from "../entities/basket/card-basket";
 import { useShopStore } from "../providers/store-provider";
+import { ProductWithCartId } from "../stores/cartSlice";
 
 export default function Basket() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -39,6 +41,7 @@ export default function Basket() {
     setDrawerOpen(false);
   };
 
+  // Granular selectors avoid unnecessary re-renders when unrelated state changes
   const cartProducts = useShopStore((state) => state.cart);
   const totalPrice = useShopStore((state) => state.totalPrice);
   const totalCount = useShopStore((state) => state.totalCount);
@@ -46,27 +49,13 @@ export default function Basket() {
   const BasketContent = (
     <Stack
       spacing={2}
-      sx={{
-        height: "100%",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-      }}
+      sx={{ height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}
     >
-      {/* CART ITEMS */}
-      <Box
-        sx={{
-          flex: 1,
-          overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          pr: 1,
-        }}
-      >
+      <Box sx={{ flex: 1, overflowY: "auto", display: "flex", flexDirection: "column", gap: 2, pr: 1 }}>
         {cartProducts.length > 0 ? (
-          cartProducts.map((e: any, index: number) => (
-            <CardBasket key={index} product={e} />
+          // Use stable cartItemId as key — never use array index
+          cartProducts.map((item: ProductWithCartId) => (
+            <CardBasket key={item.cartItemId} product={item} />
           ))
         ) : (
           <Typography color="text.secondary" textAlign="center" mt={4}>
@@ -77,11 +66,9 @@ export default function Basket() {
 
       <Divider sx={{ my: 2 }} />
 
-      {/* PROMO + BUTTON */}
       <Box>
         <Typography variant="body2" color="text.secondary" mb={1}>
-          Нд–Чт з 18:00 до закриття: піца Карбонара 30см за 100₴ або рол з
-          лососем за 150₴.
+          Нд–Чт з 18:00 до закриття: піца Карбонара 30см за 100₴ або рол з лососем за 150₴.
         </Typography>
 
         <Button
@@ -90,16 +77,11 @@ export default function Basket() {
           size="large"
           disabled={cartProducts.length === 0}
         >
-          ОФОРМИТИ ЗАМОВЛЕННЯ
+          Оформити замовлення
         </Button>
 
-        <Typography
-          variant="subtitle1"
-          textAlign="center"
-          fontWeight={600}
-          mt={1}
-        >
-          Всього: {totalCount} шт · ${totalPrice}
+        <Typography variant="subtitle1" textAlign="center" fontWeight={600} mt={1}>
+          Всього: {totalCount} шт · {totalPrice} ₴
         </Typography>
       </Box>
     </Stack>
@@ -108,81 +90,46 @@ export default function Basket() {
   return (
     <>
       <Button
-        id="id_btn"
-        aria-controls={open ? "id_menu" : undefined}
+        id="basket-btn"
+        aria-controls={open ? "basket-menu" : undefined}
         aria-haspopup="true"
         aria-expanded={open ? "true" : undefined}
         onClick={handleClick}
-        sx={{
-          borderRadius: 5,
-          py: 0.7,
-          px: 2,
-          display: "flex",
-          alignItems: "center",
-          gap: 1,
-          minWidth: isMobile ? 48 : "auto",
-        }}
+        sx={{ borderRadius: 5, py: 0.7, px: 2, display: "flex", alignItems: "center", gap: 1, minWidth: isMobile ? 48 : "auto" }}
         variant="contained"
         color={cartProducts.length > 0 ? "secondary" : "warning"}
         startIcon={<ShoppingCartIcon />}
       >
-        {isMobile ? totalCount : `CART | ${totalCount} | $${totalPrice}`}
+        {isMobile ? totalCount : `КОШИК | ${totalCount} | ${totalPrice} ₴`}
       </Button>
 
-      {/* Desktop menu */}
       {!isMobile && (
         <Menu
-          id="id_menu"
+          id="basket-menu"
           anchorEl={anchorEl}
           open={open}
           onClose={handleClose}
-          MenuListProps={{ "aria-labelledby": "id_btn" }}
+          MenuListProps={{ "aria-labelledby": "basket-btn" }}
           sx={{ mt: 1 }}
           PaperProps={{
-            sx: {
-              width: 400,
-              maxHeight: "90vh", // менше, ніж раніше
-              borderRadius: 2,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-            },
+            sx: { width: 400, maxHeight: "90vh", borderRadius: 2, p: 2, display: "flex", flexDirection: "column" },
           }}
         >
           {BasketContent}
         </Menu>
       )}
 
-      {/* Mobile drawer */}
       {isMobile && (
         <Drawer
           anchor="right"
           open={drawerOpen}
           onClose={handleClose}
-          PaperProps={{
-            sx: {
-              width: "100%",
-              maxWidth: 420,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-            },
-          }}
+          PaperProps={{ sx: { width: "100%", maxWidth: 420, p: 2, display: "flex", flexDirection: "column" } }}
         >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
-            <Typography variant="h6" fontWeight={600}>
-              Кошик
-            </Typography>
-            <IconButton onClick={handleClose}>
-              <CloseIcon />
-            </IconButton>
+          <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h6" fontWeight={600}>Кошик</Typography>
+            <IconButton onClick={handleClose} aria-label="Закрити кошик"><CloseIcon /></IconButton>
           </Box>
-
           {BasketContent}
         </Drawer>
       )}

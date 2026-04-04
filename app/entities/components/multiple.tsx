@@ -1,45 +1,35 @@
 "use client";
 
 import React from "react";
-import { Box, Fab, IconButton, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { yellow } from "@mui/material/colors";
-import { Product } from "@/types/product";
 
 interface Props {
-  reverse?: boolean
-  countProduct: number
-  plusCount: () => void
-  minusCount: () => void
+  reverse?: boolean;
+  countProduct: number;
+  plusCount: () => void;
+  minusCount: () => void;
 }
+
+const btnStyle = {
+  backgroundColor: yellow[500],
+  color: "white",
+  "&:hover": { backgroundColor: yellow[700] },
+};
 
 export default function Multiple({ reverse, countProduct, plusCount, minusCount }: Props) {
   return (
-    <Box sx={{ display: "flex", alignItems: 'center', gap: 1 }} flexDirection={reverse ? "column-reverse" : "row"} >
-      <IconButton
-        aria-label="delete"
-        size="small"
-        sx={{
-          backgroundColor: yellow[500],
-          color: "white",
-          ":hover": "none",
-        }}
-        onClick={minusCount}
-      >
+    <Box
+      sx={{ display: "flex", alignItems: "center", gap: 1 }}
+      flexDirection={reverse ? "column-reverse" : "row"}
+    >
+      <IconButton aria-label="Зменшити кількість" size="small" sx={btnStyle} onClick={minusCount}>
         <RemoveIcon fontSize="inherit" />
       </IconButton>
       <Typography component="span">{countProduct}</Typography>
-      <IconButton
-        aria-label="delete"
-        size="small"
-        sx={{
-          backgroundColor: yellow[500],
-          color: "white",
-          ":hover": "none",
-        }}
-        onClick={plusCount}
-      >
+      <IconButton aria-label="Збільшити кількість" size="small" sx={btnStyle} onClick={plusCount}>
         <AddIcon fontSize="inherit" />
       </IconButton>
     </Box>

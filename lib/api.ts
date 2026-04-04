@@ -1,14 +1,31 @@
-import { config } from "@/app/config";
 import "server-only";
+import { config } from "@/app/config";
+import { Product, Category, Pizza } from "@/types/product";
 
-export async function getPizzaId(id: string) {
-  const res = await fetch(config.url + `/products/${id}`);
+// Centralized fetch wrapper with error handling and caching
+async function apiFetch<T>(path: string, revalidate = 60): Promise<T> {
+  const url = `${config.url}${path}`;
+  const res = await fetch(url, { next: { revalidate } });
 
-  return res.json();
+  if (!res.ok) {
+    throw new Error(`API error ${res.status} for ${path}`);
+  }
+
+  return res.json() as Promise<T>;
 }
 
-export async function getCategoryId(id: string) {
-  const res = await fetch(config.url + `/${id}`);
+export async function getPizzas(): Promise<Pizza[]> {
+  return apiFetch<Pizza[]>("/products/grouped", 60);
+}
 
-  return res.json();
+export async function getCategories(): Promise<Category[]> {
+  return apiFetch<Category[]>("/categories", 3600); // categories change rarely
+}
+
+export async function getPizzaById(id: string): Promise<Product> {
+  return apiFetch<Product>(`/products/${id}`, 300);
+}
+
+export async function getCategoryById(id: string): Promise<{ pageProps: { category: { category_products: Product[] } } }> {
+  return apiFetch(`/${id}`, 300);
 }

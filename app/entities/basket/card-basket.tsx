@@ -2,72 +2,44 @@ import React from "react";
 import { Box, Paper, Stack, Typography } from "@mui/material";
 import Multiple from "../components/multiple";
 import Image from "next/image";
-import { Product } from "@/types/product";
 import { useShopStore } from "@/app/providers/store-provider";
+import { ProductWithCartId } from "@/app/stores/cartSlice";
 
-type CardBasketProps = {
-  product: Product;
-};
+interface Props {
+  product: ProductWithCartId;
+}
 
-export default function CardBasket({ product }: CardBasketProps) {
+export default function CardBasket({ product }: Props) {
   const addProductToCart = useShopStore((state) => state.addProductToCart);
-  const removeProductFromCart = useShopStore(
-    (state) => state.removeProductFromCart
-  );
+  const removeProductFromCart = useShopStore((state) => state.removeProductFromCart);
 
-  const basePrice = product.price * (product.count ?? 1);
+  const totalLinePrice = product.price * (product.count ?? 1);
 
   return (
-    <Paper
-      sx={{
-        p: 2,
-        display: "flex",
-        gap: 2,
-        alignItems: "flex-start",
-      }}
-    >
-      {/* IMAGE */}
-      <Box
-        sx={{
-          width: 100,
-          height: 100,
-          position: "relative",
-          flexShrink: 0,
-        }}
-      >
+    <Paper sx={{ p: 2, display: "flex", gap: 2, alignItems: "flex-start" }}>
+      <Box sx={{ width: 100, height: 100, position: "relative", flexShrink: 0 }}>
         <Image
           src={`https://pizzahouse.ua${product.image.large}`}
           alt={product.title}
           fill
+          sizes="100px"
           style={{ objectFit: "contain" }}
         />
       </Box>
 
-      {/* MAIN */}
-      <Box
-        sx={{
-          display: "grid",
-          gridTemplateColumns: "1fr auto",
-          width: "100%",
-          gap: 1,
-        }}
-      >
-        {/* LEFT SIDE */}
+      <Box sx={{ display: "grid", gridTemplateColumns: "1fr auto", width: "100%", gap: 1 }}>
         <Box>
-          {/* TITLE */}
           <Typography fontWeight={600}>{product.title}</Typography>
-          <br />
-          {/* PRICE */}
+
           <Typography variant="body2" fontWeight={500} mt={0.5}>
-            {basePrice} ₴
+            {totalLinePrice} ₴
           </Typography>
 
-          {/* MODIFIERS */}
           {!!product.modifiers?.length && (
             <Box mt={1}>
-              {product.modifiers.map((mod, idx) => (
+              {product.modifiers.map((mod) => (
                 <Box
-                  key={idx}
+                  key={mod._id}
                   sx={{
                     display: "grid",
                     gridTemplateColumns: "1fr auto",
@@ -76,11 +48,7 @@ export default function CardBasket({ product }: CardBasketProps) {
                     lineHeight: 1.4,
                   }}
                 >
-                  <span>
-                    {mod.count > 1 ? `${mod.count}× ` : ""}
-                    {mod.title}
-                  </span>
-
+                  <span>{mod.count && mod.count > 1 ? `${mod.count}× ` : ""}{mod.title}</span>
                   <span>+{mod.price * (mod.count ?? 1)} ₴</span>
                 </Box>
               ))}
@@ -88,7 +56,6 @@ export default function CardBasket({ product }: CardBasketProps) {
           )}
         </Box>
 
-        {/* RIGHT SIDE */}
         <Box display="flex" alignItems="center">
           <Multiple
             countProduct={product.count ?? 1}

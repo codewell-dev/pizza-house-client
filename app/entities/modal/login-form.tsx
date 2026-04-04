@@ -1,8 +1,14 @@
 "use client";
+
 import React from "react";
 import { Form, Formik } from "formik";
 import { Box, Button, TextField, Stack } from "@mui/material";
 import * as Yup from "yup";
+
+interface LoginValues {
+  phone: string;
+  password: string;
+}
 
 const phoneRegExp = /^(\+?38)?0\d{9}$/;
 
@@ -13,14 +19,17 @@ const validationSchema = Yup.object().shape({
   password: Yup.string().required("Пароль не має бути порожнім"),
 });
 
-const LoginForm = () => {
-  const handleFormSubmit = (values: any) => {
-    console.log(values);
+const initialValues: LoginValues = { phone: "+380", password: "" };
+
+export default function LoginForm() {
+  const handleFormSubmit = (values: LoginValues) => {
+    // TODO: call auth API
+    console.log("Login attempt:", values.phone);
   };
 
   return (
     <Formik
-      initialValues={{ phone: "+380", password: "" }}
+      initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={handleFormSubmit}
     >
@@ -50,12 +59,7 @@ const LoginForm = () => {
               error={Boolean(touched.password && errors.password)}
               helperText={touched.password && errors.password}
             />
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              justifyContent="space-between"
-              fontSize={12}
-            >
+            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="space-between">
               <Button type="submit" color="inherit" variant="text" fullWidth>
                 Увійти
               </Button>
@@ -68,6 +72,4 @@ const LoginForm = () => {
       )}
     </Formik>
   );
-};
-
-export default LoginForm;
+}

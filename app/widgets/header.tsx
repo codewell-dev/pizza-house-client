@@ -19,7 +19,7 @@ import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { useTheme } from "@mui/material/styles";
-
+import Image from "next/image";
 import Link from "next/link";
 import HeaderMenu from "../entities/header/header-menu";
 import HeaderSelect from "../entities/header/header-select";
@@ -30,17 +30,24 @@ export default function Header() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [elevated, setElevated] = React.useState(false);
 
   const toggleDrawer = (open: boolean) => () => setDrawerOpen(open);
 
-  const [elevated, setElevated] = React.useState(false);
-
+  // Throttle scroll handler to avoid excessive re-renders
   React.useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setElevated(window.scrollY > 10);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setElevated(window.scrollY > 10);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -49,11 +56,7 @@ export default function Header() {
       <AppBar
         position="fixed"
         elevation={elevated ? 6 : 0}
-        sx={{
-          backgroundColor: elevated ? "#fff240ff" : "#FAE900",
-
-          zIndex: 1200,
-        }}
+        sx={{ backgroundColor: elevated ? "#fff240" : "#FAE900", zIndex: 1200 }}
       >
         <Container maxWidth="xl">
           <Toolbar
@@ -64,17 +67,21 @@ export default function Header() {
               py: 1,
             }}
           >
-            {/* LEFT SIDE (Logo + Desktop Menu) */}
+            {/* Left side */}
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Link href={"/"}>
-                <img
+              <Link href="/" aria-label="На головну">
+                <Image
                   src="https://pizzahouse.ua/_next/static/media/logo.0053162d.svg"
-                  style={{ width: 55, height: 55, cursor: "pointer" }}
-                  alt="Logo"
+                  width={55}
+                  height={55}
+                  alt="Pizza House logo"
+                  priority
                 />
               </Link>
-              <HeaderMenu />
+
               {!isMobile && (
+                <>
+                  <HeaderMenu />
                   <Button
                     variant="contained"
                     color="secondary"
@@ -83,79 +90,64 @@ export default function Header() {
                   >
                     Акція
                   </Button>
+                </>
               )}
             </Box>
 
-            {/* RIGHT SIDE */}
-            {/* {!isMobile ? ( */}
-            <Box display="flex" alignItems="center" gap={1}>
-              {!isMobile ?
-              <>
-               <HeaderSelect title="ENG" links={["ENG", "RUS", "UKR"]} />
-               <HeaderSelect
-                title=""
-                links={["38000000000", "18000000000", "87000000000"]}
-              />
-               </>
-               : (
+            {/* Right side */}
+            {!isMobile ? (
+              <Box display="flex" alignItems="center" gap={1}>
+                <HeaderSelect title="UKR" links={["UKR", "ENG"]} />
                 <HeaderSelect
-                title="8-800-000-00-00"
-                links={["38000000000", "18000000000", "87000000000"]}
-              />
-               )
-               }
-             
-              <ModalPopup />
-              <Basket />
-            </Box>
-            {/* ) : (
-              <IconButton color="inherit" onClick={toggleDrawer(true)}>
+                  title="8-800-000-00-00"
+                  links={["38000000000", "18000000000"]}
+                />
+                <ModalPopup />
+                <Basket />
+              </Box>
+            ) : (
+              <IconButton color="inherit" onClick={toggleDrawer(true)} aria-label="Відкрити меню">
                 <MenuIcon />
               </IconButton>
-            )} */}
+            )}
           </Toolbar>
         </Container>
       </AppBar>
 
-      {/* <Box height="80px" />
-      {/* MOBILE DRAWER MENU */}
-      {/* <Drawer
+      {/* Spacer to offset fixed header */}
+      <Box height="80px" aria-hidden="true" />
+
+      {/* Mobile drawer */}
+      <Drawer
         anchor="right"
         open={drawerOpen}
         onClose={toggleDrawer(false)}
-        PaperProps={{
-          sx: { width: 260, backgroundColor: "#fff", p: 2 },
-        }}
+        PaperProps={{ sx: { width: 260, p: 2 } }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <img
+          <Image
             src="https://pizzahouse.ua/_next/static/media/logo.0053162d.svg"
-            style={{ width: 50 }}
-            alt="Logo"
+            width={50}
+            height={50}
+            alt="Pizza House logo"
           />
-          <IconButton onClick={toggleDrawer(false)}>
+          <IconButton onClick={toggleDrawer(false)} aria-label="Закрити меню">
             <CloseIcon />
           </IconButton>
         </Box>
 
         <List>
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Головна" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Меню" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemText primary="Контакти" />
-            </ListItemButton>
-          </ListItem>
+          {[
+            { label: "Головна", href: "/" },
+            { label: "Меню", href: "/" },
+            { label: "Контакти", href: "/" },
+          ].map(({ label, href }) => (
+            <ListItem key={label} disablePadding>
+              <ListItemButton component={Link} href={href} onClick={toggleDrawer(false)}>
+                <ListItemText primary={label} />
+              </ListItemButton>
+            </ListItem>
+          ))}
 
           <ListItem disablePadding>
             <Button
@@ -170,16 +162,13 @@ export default function Header() {
           </ListItem>
         </List>
 
-        <Box mt={3}>
-          <HeaderSelect title="ENG" links={["ENG", "RUS", "UKR"]} />
-          <HeaderSelect
-            title="Телефони"
-            links={["38000000000", "18000000000", "87000000000"]}
-          />
+        <Box mt={3} display="flex" flexDirection="column" gap={1}>
+          <HeaderSelect title="UKR" links={["UKR", "ENG"]} />
+          <HeaderSelect title="Телефони" links={["38000000000", "18000000000"]} />
           <ModalPopup />
           <Basket />
         </Box>
-      </Drawer>  */}
+      </Drawer>
     </Box>
   );
 }

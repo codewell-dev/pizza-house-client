@@ -1,3 +1,4 @@
+// All config values come from environment variables - never hardcode secrets in source code
 export const config = {
-  url: "https://r6f6p8-5000.csb.app",
-};
+  url: process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "",
+} as const;

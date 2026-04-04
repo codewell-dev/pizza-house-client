@@ -1,4 +1,5 @@
 "use client";
+
 import {
   Card,
   CardActions,
@@ -21,11 +22,11 @@ interface PizzaCardProps {
 }
 
 export default function PizzaCard({ title, products }: PizzaCardProps) {
-  const [active, setActive] = useState(0);
+  const [activeIndex, setActiveIndex] = useState(0);
   const addProductToCart = useShopStore((state) => state.addProductToCart);
-  const currentProduct = products?.[active];
 
-  const changeActive = useCallback((index: number) => setActive(index), []);
+  const currentProduct = products?.[activeIndex];
+  const handleVariantChange = useCallback((index: number) => setActiveIndex(index), []);
 
   if (!currentProduct) {
     return (
@@ -46,7 +47,6 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         flexDirection: "column",
         justifyContent: "space-between",
         borderRadius: 3,
-        width: "100%",
         overflow: "hidden",
         height: "100%",
         boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
@@ -67,7 +67,7 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         >
           <Image
             src={`https://pizzahouse.ua/${currentProduct.image.large}`}
-            alt={`Pizza ${title}`}
+            alt={`${title}`}
             fill
             sizes="(max-width: 600px) 100vw, 300px"
             style={{ objectFit: "contain" }}
@@ -109,19 +109,12 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
 
         <ProductVariants
           products={products}
-          activeIndex={active}
-          onChange={changeActive}
+          activeIndex={activeIndex}
+          onChange={handleVariantChange}
         />
       </CardContent>
 
-      <CardActions
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          px: 2,
-          pb: 2,
-        }}
-      >
+      <CardActions sx={{ display: "flex", justifyContent: "space-between", px: 2, pb: 2 }}>
         <Typography variant="h6">{currentProduct.price} ₴</Typography>
 
         <Button

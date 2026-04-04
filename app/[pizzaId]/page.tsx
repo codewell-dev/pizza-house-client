@@ -1,20 +1,56 @@
-import { getPizzaId } from "@/lib/api";
+import { Metadata } from "next";
 import { Container, Grid, Typography, Box } from "@mui/material";
+import Image from "next/image";
 import PriceBox from "../entities/productId/price-box";
 import ModifiersCheckboxList from "../entities/productId/modifiers-checkbox-list";
 import RelatedProducts from "../entities/productId/related-products";
 import ModifiersMultiple from "../entities/productId/modifiers-multiple";
 import ModifiersList from "../entities/productId/modifiers-list";
+import { getPizzaById, getPizzas } from "@/lib/api";
+import { GroupModifier } from "@/types/product";
+import { notFound } from "next/navigation";
 
-interface Params {
-  params: { pizzaId: string };
+interface PageProps {
+  params: Promise<{ pizzaId: string }>;
 }
 
-export default async function Page({ params }: Params) {
-  const pizzaId = params.pizzaId;
-  const product = await getPizzaId(pizzaId);
+// Pre-generate static pages for all known products at build time
+export async function generateStaticParams() {
+  try {
+    const pizzas = await getPizzas();
+    return pizzas.flatMap((pizza) =>
+      pizza.products.map((p) => ({ pizzaId: p._id.toString() }))
+    );
+  } catch {
+    return [];
+  }
+}
 
-  let productModifiers: any = [];
+// Dynamic metadata per product page for SEO
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  try {
+    const { pizzaId } = await params;
+    const product = await getPizzaById(pizzaId);
+    return {
+      title: product.title,
+      description: product.description,
+    };
+  } catch {
+    return { title: "Продукт не знайдено" };
+  }
+}
+
+export default async function ProductPage({ params }: PageProps) {
+  const { pizzaId } = await params;
+  const product = await getPizzaById(pizzaId);
+
+  if (!product) notFound();
+
+  const sortedModifiers = [...(product.group_modifiers ?? [])].sort((a, b) => {
+    if (a.type === "select_one" && b.type !== "select_one") return -1;
+    if (a.type !== "select_one" && b.type === "select_one") return 1;
+    return 0;
+  });
 
   return (
     <Container
@@ -27,32 +63,30 @@ export default async function Page({ params }: Params) {
         alignItems="flex-start"
         justifyContent="center"
       >
-        {/* Картинка */}
-        <Grid item xs={12} md={6} className="flex justify-center">
-          <Box
-            sx={{
-              position: "relative",
-              width: "100%",
-              maxWidth: "400px",
-              height: { xs: "300px", sm: "350px", md: "500px" },
-            }}
-          >
-            <img
-              src={`https://pizzahouse.ua${product.image.large}`}
-              alt={product.image.title || product.title}
-              className="w-full h-full object-contain mx-auto max-h-[500]"
-            />
-          </Box>
-        </Grid>
+        {/* Product image — using Next.js Image for optimization */}
+       <Grid item xs={12} md={6} className="flex justify-center">
+  <Box
+    sx={{
+      width: "100%",
+      maxWidth: "400px",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+    }}
+  >
+    <Image
+      src={`https://pizzahouse.ua${product.image.large}`}
+      alt={product.image?.title ?? product.title}
+      width={400}
+      height={400}
+      style={{ objectFit: "contain", width: "100%", height: "auto" }}
+      priority
+    />
+  </Box>
+</Grid>
 
-        {/* Контент */}
-        <Grid
-          item
-          md={6}
-          xs={12}
-          className="flex flex-col"
-          sx={{ maxWidth: "500px" }}
-        >
+        {/* Product details */}
+        <Grid item md={6} xs={12} sx={{ maxWidth: "500px" }}>
           <Typography
             variant="h4"
             component="h1"
@@ -78,8 +112,7 @@ export default async function Page({ params }: Params) {
             <PriceBox product={product} />
           </Box>
 
-          {/* Модифікатори */}
-          {product.group_modifiers?.length > 0 && (
+          {sortedModifiers.length > 0 && (
             <Box className="mt-6">
               <Typography variant="h5" gutterBottom>
                 Хочу додати
@@ -87,34 +120,25 @@ export default async function Page({ params }: Params) {
 
               <ModifiersList />
 
-              {[...product.group_modifiers]
-                .sort((a, b) => {
-                  if (a.type === "select_one" && b.type !== "select_one")
-                    return -1;
-                  if (a.type !== "select_one" && b.type === "select_one")
-                    return 1;
-                  return 0;
-                })
-                .map((mod: any) =>
-                  mod.type === "select_one" ? (
-                    <ModifiersCheckboxList
-                      key={mod._id}
-                      title={mod.title}
-                      modifiers={mod.modifiers}
-                      groupId={mod._id}
-                    />
-                  ) : mod.type === "select_many" ? (
-                    <ModifiersMultiple key={mod._id} e={mod} />
-                  ) : null
-                )}
+              {sortedModifiers.map((mod: GroupModifier) =>
+                mod.type === "select_one" ? (
+                  <ModifiersCheckboxList
+                    key={mod._id}
+                    title={mod.title}
+                    modifiers={mod.modifiers}
+                    groupId={mod._id}
+                  />
+                ) : mod.type === "select_many" ? (
+                  <ModifiersMultiple key={mod._id} group={mod} />
+                ) : null
+              )}
             </Box>
           )}
         </Grid>
       </Grid>
 
-      {/* Супутні продукти */}
       <Box sx={{ mt: { xs: 6, md: 12 } }}>
-        <RelatedProducts products={product.well_together_products} />
+        <RelatedProducts products={product.well_together_products ?? []} />
       </Box>
     </Container>
   );
