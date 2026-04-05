@@ -3,6 +3,7 @@ import { Container, Grid } from "@mui/material";
 import CardProduct from "@/app/entities/components/card-product";
 import { getCategoryById } from "@/lib/api";
 import { Product } from "@/types/product";
+import { getTranslations } from "next-intl/server";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -12,19 +13,24 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  return { title: `Категорія: ${id}` };
+  const t = await getTranslations("category");
+  return { title: `${t("metaTitle")}: ${id}` };
 }
 
 export default async function CategoryPage({ params }: PageProps) {
   const { id } = await params;
-  const response = await getCategoryById(id);
-  const products: Product[] =
-    response?.pageProps?.category?.category_products ?? [];
+  const [response, t] = await Promise.all([
+    getCategoryById(id),
+    getTranslations("category"),
+  ]);
+
+  // New backend returns category object directly, products in category_products
+  const products: Product[] = response?.category_products ?? [];
 
   if (products.length === 0) {
     return (
       <Container maxWidth="xl" sx={{ py: 6 }}>
-        <p>Немає продуктів у цій категорії.</p>
+        <p>{t("empty")}</p>
       </Container>
     );
   }

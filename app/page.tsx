@@ -25,7 +25,7 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto">
-      <div className="mb-8">
+      <div className="my-8">
         <Carousel />
       </div>
 

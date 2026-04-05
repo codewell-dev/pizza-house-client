@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import Link from "next/link";
 import CardBasket from "../entities/basket/card-basket";
 import { useShopStore } from "../providers/store-provider";
 import { ProductWithCartId } from "../stores/cartSlice";
@@ -33,7 +34,6 @@ export default function Basket() {
     if (isMobile) setDrawerOpen(true);
     else setAnchorEl(event.currentTarget);
   };
-
   const handleClose = () => {
     setAnchorEl(null);
     setDrawerOpen(false);
@@ -80,14 +80,27 @@ export default function Basket() {
         <Typography variant="body2" color="text.secondary" mb={1}>
           {t("promo")}
         </Typography>
+
+        {/* Checkout button → /order page */}
         <Button
           variant="contained"
           fullWidth
           size="large"
+          component={Link}
+          href="/order"
+          onClick={handleClose}
           disabled={cartProducts.length === 0}
+          sx={{
+            borderRadius: 3,
+            bgcolor: "#FAE900",
+            color: "#111",
+            fontWeight: 700,
+            "&:hover": { bgcolor: "#f5df00" },
+          }}
         >
           {t("checkout")}
         </Button>
+
         <Typography
           variant="subtitle1"
           textAlign="center"

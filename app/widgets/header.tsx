@@ -159,83 +159,85 @@ export default function Header({
             top: { xs: "56px", md: "64px" },
             zIndex: 1100,
           }}
-        >
-          <Container maxWidth="xl" disableGutters>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "flex-start",
-                overflowX: "auto",
-                scrollbarWidth: "none",
-                "&::-webkit-scrollbar": { display: "none" },
-                px: { xs: 1, md: 2 },
-                py: "8px",
-                gap: "4px",
-              }}
-            >
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={`/category/${cat.url}`}
-                  style={{ textDecoration: "none", flexShrink: 0 }}
+        ></Box>
+      )}
+      {!isMobile && (
+        <Container maxWidth="xl" disableGutters>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "flex-start",
+              overflowX: "auto",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": { display: "none" },
+              px: { xs: 1, md: 2 },
+              py: "8px",
+              gap: "4px",
+              bgcolor: "white",
+            }}
+          >
+            {categories.map((cat) => (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.url}`}
+                style={{ textDecoration: "none", flexShrink: 0 }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    px: { xs: "8px", md: "10px" },
+                    py: "6px",
+                    borderRadius: "10px",
+                    minWidth: { xs: 58, md: 68 },
+                    maxWidth: 80,
+                    cursor: "pointer",
+                    transition: "background 0.15s",
+                    "&:hover": { bgcolor: "rgba(0,0,0,0.07)" },
+                    "&:active": { bgcolor: "rgba(0,0,0,0.12)" },
+                  }}
                 >
                   <Box
                     sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: "center",
-                      px: { xs: "8px", md: "10px" },
-                      py: "6px",
-                      borderRadius: "10px",
-                      minWidth: { xs: 58, md: 68 },
-                      maxWidth: 80,
-                      cursor: "pointer",
-                      transition: "background 0.15s",
-                      "&:hover": { bgcolor: "rgba(0,0,0,0.07)" },
-                      "&:active": { bgcolor: "rgba(0,0,0,0.12)" },
+                      width: { xs: 32, md: 36 },
+                      height: { xs: 32, md: 36 },
+                      position: "relative",
                     }}
                   >
-                    <Box
-                      sx={{
-                        width: { xs: 32, md: 36 },
-                        height: { xs: 32, md: 36 },
-                        position: "relative",
-                      }}
-                    >
-                      <Image
-                        src={
-                          cat.image.startsWith("http")
-                            ? cat.image
-                            : `https://pizzahouse.ua${cat.image}`
-                        }
-                        alt={cat.title}
-                        fill
-                        sizes="36px"
-                        style={{ objectFit: "contain" }}
-                      />
-                    </Box>
-                    <Typography
-                      sx={{
-                        fontSize: { xs: "10px", md: "11px" },
-                        lineHeight: 1.25,
-                        mt: "5px",
-                        textAlign: "center",
-                        color: "#111",
-                        fontWeight: 500,
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
-                      }}
-                    >
-                      {cat.title}
-                    </Typography>
+                    <Image
+                      src={
+                        cat.image.startsWith("http")
+                          ? cat.image
+                          : `https://pizzahouse.ua${cat.image}`
+                      }
+                      alt={cat.title}
+                      fill
+                      sizes="36px"
+                      style={{ objectFit: "contain" }}
+                    />
                   </Box>
-                </Link>
-              ))}
-            </Box>
-          </Container>
-        </Box>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "10px", md: "11px" },
+                      lineHeight: 1.25,
+                      mt: "5px",
+                      textAlign: "center",
+                      color: "#111",
+                      fontWeight: 500,
+                      display: "-webkit-box",
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: "vertical",
+                      overflow: "hidden",
+                    }}
+                  >
+                    {cat.title}
+                  </Typography>
+                </Box>
+              </Link>
+            ))}
+          </Box>
+        </Container>
       )}
 
       {/* ── MOBILE DRAWER ── */}

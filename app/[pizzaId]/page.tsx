@@ -6,6 +6,7 @@ import ModifiersCheckboxList from "../entities/productId/modifiers-checkbox-list
 import RelatedProducts from "../entities/productId/related-products";
 import ModifiersMultiple from "../entities/productId/modifiers-multiple";
 import ModifiersList from "../entities/productId/modifiers-list";
+import Breadcrumbs from "../entities/breadcrumbs/breadcrumbs";
 import { getPizzaById, getPizzas } from "@/lib/api";
 import { GroupModifier } from "@/types/product";
 import { notFound } from "next/navigation";
@@ -40,9 +41,10 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: PageProps) {
   const { pizzaId } = await params;
-  const [product, t] = await Promise.all([
+  const [product, t, tb] = await Promise.all([
     getPizzaById(pizzaId),
     getTranslations("product"),
+    getTranslations("breadcrumbs"),
   ]);
 
   if (!product) notFound();
@@ -56,13 +58,23 @@ export default async function ProductPage({ params }: PageProps) {
   return (
     <Container
       maxWidth="xl"
-      sx={{ py: { xs: 4, md: 8 }, px: { xs: 2, sm: 3, md: 4 } }}
+      sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, sm: 3, md: 4 } }}
     >
+      {/* Breadcrumbs: Головна / Піца / {product.title} */}
+      <Breadcrumbs
+        crumbs={[
+          { label: tb("home"), href: "/" },
+          { label: tb("pizza"), href: "/" },
+          { label: product.title },
+        ]}
+      />
+
       <Grid
         container
         spacing={{ xs: 2, md: 4 }}
         alignItems="flex-start"
         justifyContent="center"
+        sx={{ mt: 1 }}
       >
         <Grid size={{ xs: 12, md: 6 }} className="flex justify-center">
           <Box

@@ -1,14 +1,6 @@
 "use client";
 
-import {
-  Card,
-  CardActions,
-  CardContent,
-  Button,
-  Typography,
-  Box,
-  Skeleton,
-} from "@mui/material";
+import { Box, Typography, Button, Skeleton } from "@mui/material";
 import Link from "next/link";
 import Image from "next/image";
 import { useShopStore } from "../../providers/store-provider";
@@ -35,71 +27,108 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
 
   if (!currentProduct) {
     return (
-      <Card sx={{ height: "100%", p: 2 }}>
-        <Skeleton variant="rectangular" height={180} sx={{ mb: 2 }} />
-        <Skeleton width="70%" height={30} />
+      <Box
+        sx={{
+          width: "100%",
+          bgcolor: "#fff",
+          borderRadius: "16px",
+          p: 2,
+          border: "1px solid rgba(0,0,0,0.06)",
+        }}
+      >
+        <Skeleton
+          variant="rectangular"
+          height={200}
+          sx={{ borderRadius: 2, mb: 1.5 }}
+        />
+        <Skeleton width="70%" height={24} sx={{ mb: 0.5 }} />
         <Skeleton width="90%" height={16} />
         <Skeleton width="60%" height={16} />
-        <Skeleton width="100%" height={50} sx={{ mt: 3 }} />
-      </Card>
+        <Skeleton width="100%" height={44} sx={{ mt: 2 }} />
+      </Box>
     );
   }
 
   return (
-    <Card
+    <Box
       sx={{
+        width: "100%",
+        bgcolor: "#fff",
+        borderRadius: "16px",
+        border: "1px solid rgba(0,0,0,0.06)",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
-        borderRadius: 3,
         overflow: "hidden",
-        height: "100%",
-        boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-        "&:hover": { transform: "translateY(-2px)", transition: "0.3s ease" },
+        transition: "box-shadow 0.2s, transform 0.2s",
+        "&:hover": {
+          boxShadow: "0 8px 32px rgba(0,0,0,0.10)",
+          transform: "translateY(-2px)",
+        },
       }}
     >
-      <Link href={`/${currentProduct._id}`} prefetch={false}>
+      {/* Image — no crop, full pizza visible like on pizzahouse.ua */}
+      <Link
+        href={`/${currentProduct._id}`}
+        prefetch={false}
+        style={{ display: "block" }}
+      >
         <Box
-          position="relative"
-          width="100%"
-          maxWidth={300}
-          height={{ xs: 230, sm: 270, md: 320 }}
           sx={{
-            marginInline: "auto",
-            transition: "transform .25s ease",
-            "&:hover": { transform: "scale(1.05)" },
+            width: "100%",
+            aspectRatio: "1 / 1",
+            position: "relative",
+            bgcolor: "#fafafa",
+            transition: "transform 0.25s ease",
+            "&:hover": { transform: "scale(1.04)" },
           }}
         >
           <Image
             src={`https://pizzahouse.ua/${currentProduct.image.large}`}
             alt={title}
             fill
-            sizes="(max-width: 600px) 100vw, 300px"
-            style={{ objectFit: "contain" }}
+            sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 25vw"
+            style={{ objectFit: "contain", padding: "8px" }}
           />
         </Box>
       </Link>
 
-      <CardContent sx={{ px: 2, py: 1 }}>
-        <Link href={`/${currentProduct._id}`} prefetch={false}>
+      {/* Content */}
+      <Box
+        sx={{
+          p: "12px 16px 16px",
+          display: "flex",
+          flexDirection: "column",
+          flex: 1,
+        }}
+      >
+        <Link
+          href={`/${currentProduct._id}`}
+          prefetch={false}
+          style={{ textDecoration: "none" }}
+        >
           <Typography
-            variant="h6"
-            fontWeight={600}
             sx={{
-              fontSize: { xs: "1rem", sm: "1.1rem" },
-              whiteSpace: "nowrap",
+              fontFamily: '"Nunito", sans-serif',
+              fontWeight: 700,
+              fontSize: { xs: "0.95rem", sm: "1rem" },
+              color: "#1a1a1a",
+              mb: 0.5,
+              lineHeight: 1.3,
+              display: "-webkit-box",
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: "vertical",
               overflow: "hidden",
-              textOverflow: "ellipsis",
             }}
           >
             {title}
           </Typography>
+
           <Typography
             variant="body2"
             sx={{
-              color: "text.secondary",
-              fontSize: { xs: "0.8rem", sm: "0.9rem" },
-              lineHeight: 1.3,
+              color: "#888",
+              fontSize: "0.78rem",
+              lineHeight: 1.4,
               mb: 1,
               display: "-webkit-box",
               WebkitLineClamp: 2,
@@ -110,25 +139,57 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
             {products[0]?.description}
           </Typography>
         </Link>
-        <ProductVariants
-          products={products}
-          activeIndex={activeIndex}
-          onChange={handleVariantChange}
-        />
-      </CardContent>
 
-      <CardActions
-        sx={{ display: "flex", justifyContent: "space-between", px: 2, pb: 2 }}
-      >
-        <Typography variant="h6">{currentProduct.price} ₴</Typography>
-        <Button
-          variant="contained"
-          sx={{ borderRadius: 3 }}
-          onClick={() => addProductToCart(currentProduct)}
+        {/* Size variants */}
+        {products.length > 1 && (
+          <ProductVariants
+            products={products}
+            activeIndex={activeIndex}
+            onChange={handleVariantChange}
+          />
+        )}
+
+        {/* Price + button */}
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mt: "auto",
+            pt: 1.5,
+          }}
         >
-          {t("addToCart")}
-        </Button>
-      </CardActions>
-    </Card>
+          <Typography
+            sx={{
+              fontFamily: '"Nunito", sans-serif',
+              fontWeight: 800,
+              fontSize: "1.2rem",
+              color: "#1a1a1a",
+            }}
+          >
+            {currentProduct.price} ₴
+          </Typography>
+
+          <Button
+            variant="contained"
+            size="small"
+            onClick={() => addProductToCart(currentProduct)}
+            sx={{
+              bgcolor: "#FAE900",
+              color: "#111",
+              fontWeight: 700,
+              fontSize: "0.82rem",
+              borderRadius: "10px",
+              px: 2,
+              py: 0.8,
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#f5df00", boxShadow: "none" },
+            }}
+          >
+            {t("addToCart")}
+          </Button>
+        </Box>
+      </Box>
+    </Box>
   );
 }
