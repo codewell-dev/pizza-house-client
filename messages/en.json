@@ -1,0 +1,68 @@
+{
+  "header": {
+    "promotions": "Promotions",
+    "login": "Log in",
+    "cart": "Cart",
+    "phone": "8-800-000-00-00",
+    "close": "Close",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "basket": {
+    "title": "Cart",
+    "empty": "Your cart is empty 🍕",
+    "promo": "Sun–Thu from 18:00: Carbonara pizza 30cm for 100₴ or salmon roll for 150₴.",
+    "checkout": "Place order",
+    "total": "Total",
+    "pieces": "pcs",
+    "closeCart": "Close cart",
+    "button": "CART"
+  },
+  "login": {
+    "openBtn": "LOG IN",
+    "title": "Log in",
+    "subtitle": "Please enter your phone number and password",
+    "phone": "Phone number",
+    "password": "Password",
+    "submit": "Log in",
+    "forgot": "Forgot password?",
+    "close": "Close",
+    "phoneError": "Please enter a valid phone number",
+    "phoneRequired": "This field is required",
+    "passwordRequired": "Password must not be empty"
+  },
+  "product": {
+    "addToCart": "Add to cart",
+    "weight": "g.",
+    "weightShort": "g",
+    "addons": "Add extras",
+    "relatedTitle": "Often ordered with",
+    "addToCartAria": "Add to cart",
+    "removeAria": "Remove"
+  },
+  "category": {
+    "empty": "No products in this category.",
+    "metaTitle": "Category"
+  },
+  "footer": {
+    "copyright": "© 2008–2025 Pizza House. All rights reserved.",
+    "nav": {
+      "home": "Home",
+      "restaurants": "Restaurants",
+      "reviews": "Reviews",
+      "promotions": "Promotions",
+      "news": "News",
+      "bonus": "Loyalty program",
+      "delivery": "Delivery terms",
+      "banquets": "Banquets",
+      "about": "About Pizza House",
+      "careers": "Careers",
+      "contacts": "Contact management",
+      "offer": "Public offer",
+      "terms": "Company terms"
+    }
+  },
+  "carousel": {
+    "slide": "Promotion"
+  }
+}

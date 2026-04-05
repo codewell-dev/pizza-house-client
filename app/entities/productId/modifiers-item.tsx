@@ -5,6 +5,7 @@ import { yellow } from "@mui/material/colors";
 import RemoveIcon from "@mui/icons-material/Remove";
 import { Modifier } from "@/types/product";
 import { useShopStore } from "@/app/providers/store-provider";
+import { useTranslations } from "next-intl";
 
 interface Props {
   modifier: Modifier;
@@ -12,6 +13,7 @@ interface Props {
 
 export default function ModifiersItem({ modifier }: Props) {
   const removeModifier = useShopStore((state) => state.removeModifier);
+  const t = useTranslations("product");
 
   return (
     <Box
@@ -32,9 +34,15 @@ export default function ModifiersItem({ modifier }: Props) {
         {modifier.title} ×{modifier.count}
       </Typography>
       <IconButton
-        aria-label={`Видалити ${modifier.title}`}
+        aria-label={`${t("removeAria")} ${modifier.title}`}
         size="small"
-        sx={{ backgroundColor: yellow[500], color: "white", width: 17, height: 17, "&:hover": { backgroundColor: yellow[700] } }}
+        sx={{
+          backgroundColor: yellow[500],
+          color: "white",
+          width: 17,
+          height: 17,
+          "&:hover": { backgroundColor: yellow[700] },
+        }}
         onClick={() => removeModifier(modifier._id)}
       >
         <RemoveIcon fontSize="inherit" />

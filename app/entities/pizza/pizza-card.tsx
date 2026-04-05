@@ -15,6 +15,7 @@ import { useShopStore } from "../../providers/store-provider";
 import { Product } from "@/types/product";
 import { useCallback, useState } from "react";
 import ProductVariants from "./pizza-variants";
+import { useTranslations } from "next-intl";
 
 interface PizzaCardProps {
   title: string;
@@ -24,6 +25,7 @@ interface PizzaCardProps {
 export default function PizzaCard({ title, products }: PizzaCardProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const addProductToCart = useShopStore((state) => state.addProductToCart);
+  const t = useTranslations("product");
 
   const currentProduct = products?.[activeIndex];
   const handleVariantChange = useCallback(
@@ -70,7 +72,7 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         >
           <Image
             src={`https://pizzahouse.ua/${currentProduct.image.large}`}
-            alt={`${title}`}
+            alt={title}
             fill
             sizes="(max-width: 600px) 100vw, 300px"
             style={{ objectFit: "contain" }}
@@ -92,7 +94,6 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
           >
             {title}
           </Typography>
-
           <Typography
             variant="body2"
             sx={{
@@ -109,7 +110,6 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
             {products[0]?.description}
           </Typography>
         </Link>
-
         <ProductVariants
           products={products}
           activeIndex={activeIndex}
@@ -121,13 +121,12 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
         sx={{ display: "flex", justifyContent: "space-between", px: 2, pb: 2 }}
       >
         <Typography variant="h6">{currentProduct.price} ₴</Typography>
-
         <Button
           variant="contained"
           sx={{ borderRadius: 3 }}
           onClick={() => addProductToCart(currentProduct)}
         >
-          У кошик
+          {t("addToCart")}
         </Button>
       </CardActions>
     </Card>

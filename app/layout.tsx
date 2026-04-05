@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
@@ -10,6 +12,7 @@ import Header from "./widgets/header";
 import Footer from "./widgets/footer";
 import { ShopStoreProvider } from "./providers/store-provider";
 import { getCategories } from "@/lib/api";
+import type { Locale } from "@/i18n/config";
 
 export const metadata: Metadata = {
   title: {
@@ -23,19 +26,27 @@ export const metadata: Metadata = {
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  // Fetch categories once at layout level — shared across all pages
-  const categories = await getCategories().catch(() => []);
+  const [categories, locale, messages] = await Promise.all([
+    getCategories().catch(() => []),
+    getLocale(),
+    getMessages(),
+  ]);
 
   return (
-    <html lang="uk" suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <AppThemeProvider>
-          <ShopStoreProvider>
-            <Header categories={categories} />
-            <main>{children}</main>
-            <Footer />
-          </ShopStoreProvider>
-        </AppThemeProvider>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <AppThemeProvider>
+            <ShopStoreProvider>
+              <Header
+                categories={categories}
+                currentLocale={locale as Locale}
+              />
+              <main>{children}</main>
+              <Footer />
+            </ShopStoreProvider>
+          </AppThemeProvider>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

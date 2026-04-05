@@ -1,4 +1,7 @@
 import type { NextConfig } from "next";
+import createNextIntlPlugin from "next-intl/plugin";
+
+const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["ykj7fs-3000.csb.app"],
@@ -12,10 +15,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-  // Enable compiler optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === "production",
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

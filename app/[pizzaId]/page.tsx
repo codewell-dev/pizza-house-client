@@ -9,12 +9,12 @@ import ModifiersList from "../entities/productId/modifiers-list";
 import { getPizzaById, getPizzas } from "@/lib/api";
 import { GroupModifier } from "@/types/product";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 interface PageProps {
   params: Promise<{ pizzaId: string }>;
 }
 
-// Pre-generate static pages for all known products at build time
 export async function generateStaticParams() {
   try {
     const pizzas = await getPizzas();
@@ -26,17 +26,13 @@ export async function generateStaticParams() {
   }
 }
 
-// Dynamic metadata per product page for SEO
 export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   try {
     const { pizzaId } = await params;
     const product = await getPizzaById(pizzaId);
-    return {
-      title: product.title,
-      description: product.description,
-    };
+    return { title: product.title, description: product.description };
   } catch {
     return { title: "Продукт не знайдено" };
   }
@@ -44,7 +40,10 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: PageProps) {
   const { pizzaId } = await params;
-  const product = await getPizzaById(pizzaId);
+  const [product, t] = await Promise.all([
+    getPizzaById(pizzaId),
+    getTranslations("product"),
+  ]);
 
   if (!product) notFound();
 
@@ -65,7 +64,6 @@ export default async function ProductPage({ params }: PageProps) {
         alignItems="flex-start"
         justifyContent="center"
       >
-        {/* Product image — using Next.js Image for optimization */}
         <Grid size={{ xs: 12, md: 6 }} className="flex justify-center">
           <Box
             sx={{
@@ -87,19 +85,18 @@ export default async function ProductPage({ params }: PageProps) {
           </Box>
         </Grid>
 
-        {/* Product details */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ maxWidth: "500px" }}>
           <Typography
             variant="h4"
             component="h1"
             sx={{ fontSize: { xs: "1.75rem", sm: "2.2rem", md: "2.5rem" } }}
-            gutterBottomF
+            gutterBottom
           >
             {product.title}
           </Typography>
 
           <Typography variant="h6" color="text.secondary" gutterBottom>
-            {product.weight} гр.
+            {product.weight} {t("weight")}
           </Typography>
 
           <Typography
@@ -117,11 +114,9 @@ export default async function ProductPage({ params }: PageProps) {
           {sortedModifiers.length > 0 && (
             <Box className="mt-6">
               <Typography variant="h5" gutterBottom>
-                Хочу додати
+                {t("addons")}
               </Typography>
-
               <ModifiersList />
-
               {sortedModifiers.map((mod: GroupModifier) =>
                 mod.type === "select_one" ? (
                   <ModifiersCheckboxList

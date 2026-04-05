@@ -22,20 +22,28 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 import { useTheme } from "@mui/material/styles";
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import Basket from "./basket";
 import ModalPopup from "./modal-popup";
 import HeaderSelect from "../entities/header/header-select";
+import LanguageSwitcher from "../entities/header/language-switcher";
 import { Category } from "@/types/product";
+import type { Locale } from "@/i18n/config";
 
 interface HeaderProps {
   categories?: Category[];
+  currentLocale: Locale;
 }
 
-export default function Header({ categories = [] }: HeaderProps) {
+export default function Header({
+  categories = [],
+  currentLocale,
+}: HeaderProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [elevated, setElevated] = React.useState(false);
+  const t = useTranslations("header");
 
   React.useEffect(() => {
     let ticking = false;
@@ -54,7 +62,7 @@ export default function Header({ categories = [] }: HeaderProps) {
 
   return (
     <>
-      {/* ── FIXED AppBar — тільки верхній рядок ── */}
+      {/* ── FIXED AppBar ── */}
       <AppBar
         position="fixed"
         elevation={elevated ? 4 : 0}
@@ -70,7 +78,7 @@ export default function Header({ categories = [] }: HeaderProps) {
               minHeight: { xs: "56px", md: "64px" },
             }}
           >
-            {/* Logo */}
+            {/* Logo + Акції */}
             <Box
               sx={{
                 display: "flex",
@@ -105,7 +113,7 @@ export default function Header({ categories = [] }: HeaderProps) {
                     "&:hover": { boxShadow: "none" },
                   }}
                 >
-                  Акції
+                  {t("promotions")}
                 </Button>
               )}
             </Box>
@@ -113,9 +121,10 @@ export default function Header({ categories = [] }: HeaderProps) {
             {/* Right */}
             {!isMobile ? (
               <Box display="flex" alignItems="center" gap={0.5}>
-                <HeaderSelect title="UKR" links={["UKR", "ENG"]} />
+                {/* Language switcher — replaces old HeaderSelect for lang */}
+                <LanguageSwitcher currentLocale={currentLocale} />
                 <HeaderSelect
-                  title="8-800-000-00-00"
+                  title={t("phone")}
                   links={["38000000000", "18000000000"]}
                 />
                 <ModalPopup />
@@ -137,10 +146,10 @@ export default function Header({ categories = [] }: HeaderProps) {
         </Container>
       </AppBar>
 
-      {/* Spacer під fixed AppBar */}
+      {/* Spacer */}
       <Box sx={{ height: { xs: "56px", md: "64px" } }} aria-hidden="true" />
 
-      {/* ── CATEGORY STRIP — НЕ фіксована, скролиться зі сторінкою ── */}
+      {/* ── CATEGORY STRIP — sticky, не в AppBar ── */}
       {categories.length > 0 && (
         <Box
           sx={{
@@ -150,88 +159,86 @@ export default function Header({ categories = [] }: HeaderProps) {
             top: { xs: "56px", md: "64px" },
             zIndex: 1100,
           }}
-        ></Box>
-      )}
-
-      {!isMobile && (
-        <Container maxWidth="xl" disableGutters>
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "flex-start",
-              overflowX: "auto",
-              scrollbarWidth: "none",
-              "&::-webkit-scrollbar": { display: "none" },
-              px: { xs: 1, md: 2 },
-              py: "8px",
-              gap: "4px",
-            }}
-          >
-            {categories.map((cat) => (
-              <Link
-                key={cat.id}
-                href={"/"}
-                style={{ textDecoration: "none", flexShrink: 0 }}
-              >
-                <Box
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    px: { xs: "8px", md: "10px" },
-                    py: "6px",
-                    borderRadius: "10px",
-                    minWidth: { xs: 58, md: 68 },
-                    maxWidth: 80,
-                    cursor: "pointer",
-                    transition: "background 0.15s",
-                    "&:hover": { bgcolor: "rgba(0,0,0,0.07)" },
-                    "&:active": { bgcolor: "rgba(0,0,0,0.12)" },
-                  }}
+        >
+          <Container maxWidth="xl" disableGutters>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "flex-start",
+                overflowX: "auto",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": { display: "none" },
+                px: { xs: 1, md: 2 },
+                py: "8px",
+                gap: "4px",
+              }}
+            >
+              {categories.map((cat) => (
+                <Link
+                  key={cat.id}
+                  href={`/category/${cat.url}`}
+                  style={{ textDecoration: "none", flexShrink: 0 }}
                 >
                   <Box
                     sx={{
-                      width: { xs: 32, md: 36 },
-                      height: { xs: 32, md: 36 },
-                      position: "relative",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      px: { xs: "8px", md: "10px" },
+                      py: "6px",
+                      borderRadius: "10px",
+                      minWidth: { xs: 58, md: 68 },
+                      maxWidth: 80,
+                      cursor: "pointer",
+                      transition: "background 0.15s",
+                      "&:hover": { bgcolor: "rgba(0,0,0,0.07)" },
+                      "&:active": { bgcolor: "rgba(0,0,0,0.12)" },
                     }}
                   >
-                    <Image
-                      src={
-                        cat.image.startsWith("http")
-                          ? cat.image
-                          : `https://pizzahouse.ua${cat.image}`
-                      }
-                      alt={cat.title}
-                      fill
-                      sizes="36px"
-                      style={{ objectFit: "contain" }}
-                    />
+                    <Box
+                      sx={{
+                        width: { xs: 32, md: 36 },
+                        height: { xs: 32, md: 36 },
+                        position: "relative",
+                      }}
+                    >
+                      <Image
+                        src={
+                          cat.image.startsWith("http")
+                            ? cat.image
+                            : `https://pizzahouse.ua${cat.image}`
+                        }
+                        alt={cat.title}
+                        fill
+                        sizes="36px"
+                        style={{ objectFit: "contain" }}
+                      />
+                    </Box>
+                    <Typography
+                      sx={{
+                        fontSize: { xs: "10px", md: "11px" },
+                        lineHeight: 1.25,
+                        mt: "5px",
+                        textAlign: "center",
+                        color: "#111",
+                        fontWeight: 500,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
+                      {cat.title}
+                    </Typography>
                   </Box>
-                  <Typography
-                    sx={{
-                      fontSize: { xs: "10px", md: "11px" },
-                      lineHeight: 1.25,
-                      mt: "5px",
-                      textAlign: "center",
-                      color: "#111",
-                      fontWeight: 500,
-                      display: "-webkit-box",
-                      WebkitLineClamp: 2,
-                      WebkitBoxOrient: "vertical",
-                      overflow: "hidden",
-                    }}
-                  >
-                    {cat.title}
-                  </Typography>
-                </Box>
-              </Link>
-            ))}
-          </Box>
-        </Container>
+                </Link>
+              ))}
+            </Box>
+          </Container>
+        </Box>
       )}
 
-      {/* ── MOBILE FULLSCREEN DRAWER ── */}
+      {/* ── MOBILE DRAWER ── */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -245,7 +252,6 @@ export default function Header({ categories = [] }: HeaderProps) {
           },
         }}
       >
-        {/* Drawer header */}
         <Box
           sx={{
             display: "flex",
@@ -265,18 +271,19 @@ export default function Header({ categories = [] }: HeaderProps) {
               style={{ height: "auto" }}
             />
           </Link>
-          <IconButton
-            onClick={() => setDrawerOpen(false)}
-            aria-label="Закрити меню"
-          >
-            <CloseIcon sx={{ fontSize: 28 }} />
-          </IconButton>
+          {/* Language switcher inside mobile drawer */}
+          <Box display="flex" alignItems="center" gap={1}>
+            <LanguageSwitcher currentLocale={currentLocale} />
+            <IconButton
+              onClick={() => setDrawerOpen(false)}
+              aria-label={t("close")}
+            >
+              <CloseIcon sx={{ fontSize: 28 }} />
+            </IconButton>
+          </Box>
         </Box>
 
-        {/* Category list — рядками як на оригіналі */}
-        <Box
-          sx={{ flex: 1, overflowY: "auto", px: 2, py: 1, bgcolor: "white" }}
-        >
+        <Box sx={{ flex: 1, overflowY: "auto", px: 2, py: 1 }}>
           {categories.map((cat) => (
             <React.Fragment key={cat.id}>
               <Link
@@ -327,14 +334,7 @@ export default function Header({ categories = [] }: HeaderProps) {
           ))}
         </Box>
 
-        {/* Bottom: login + socials */}
-        <Box
-          sx={{
-            px: 2,
-            py: 2,
-            borderTop: "1px solid rgba(0,0,0,0.1)",
-          }}
-        >
+        <Box sx={{ px: 2, py: 2, borderTop: "1px solid rgba(0,0,0,0.1)" }}>
           <ModalPopup />
           <Box display="flex" gap={1} mt={1}>
             <IconButton aria-label="Instagram" size="small">

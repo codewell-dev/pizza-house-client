@@ -11,6 +11,7 @@ import Image from "next/image";
 import { Box } from "@mui/material";
 import { Product } from "@/types/product";
 import { useShopStore } from "@/app/providers/store-provider";
+import { useTranslations } from "next-intl";
 
 interface Props {
   product: Product;
@@ -18,6 +19,7 @@ interface Props {
 
 export default function CardProduct({ product }: Props) {
   const addProductToCart = useShopStore((state) => state.addProductToCart);
+  const t = useTranslations("product");
 
   if (!product) return null;
 
@@ -41,7 +43,14 @@ export default function CardProduct({ product }: Props) {
             {product.description}
           </Typography>
         </CardContent>
-        <CardActions sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", m: 1 }}>
+        <CardActions
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            m: 1,
+          }}
+        >
           <Typography sx={{ ml: 1.5 }} variant="h6" component="div">
             {product.price} ₴
           </Typography>
@@ -53,7 +62,7 @@ export default function CardProduct({ product }: Props) {
               addProductToCart(product);
             }}
           >
-            У кошик
+            {t("addToCart")}
           </Button>
         </CardActions>
       </Card>

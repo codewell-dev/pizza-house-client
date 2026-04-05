@@ -4,6 +4,7 @@ import React from "react";
 import { Form, Formik } from "formik";
 import { Box, Button, TextField, Stack } from "@mui/material";
 import * as Yup from "yup";
+import { useTranslations } from "next-intl";
 
 interface LoginValues {
   phone: string;
@@ -11,19 +12,19 @@ interface LoginValues {
 }
 
 const phoneRegExp = /^(\+?38)?0\d{9}$/;
-
-const validationSchema = Yup.object().shape({
-  phone: Yup.string()
-    .matches(phoneRegExp, "Будь-ласка, перевірте коректність номера телефону")
-    .required("Поле має бути заповнене"),
-  password: Yup.string().required("Пароль не має бути порожнім"),
-});
-
 const initialValues: LoginValues = { phone: "+380", password: "" };
 
 export default function LoginForm() {
+  const t = useTranslations("login");
+
+  const validationSchema = Yup.object().shape({
+    phone: Yup.string()
+      .matches(phoneRegExp, t("phoneError"))
+      .required(t("phoneRequired")),
+    password: Yup.string().required(t("passwordRequired")),
+  });
+
   const handleFormSubmit = (values: LoginValues) => {
-    // TODO: call auth API
     console.log("Login attempt:", values.phone);
   };
 
@@ -37,7 +38,7 @@ export default function LoginForm() {
         <Form onSubmit={handleSubmit}>
           <Stack spacing={1}>
             <TextField
-              label="Номер телефону"
+              label={t("phone")}
               variant="outlined"
               name="phone"
               fullWidth
@@ -48,7 +49,7 @@ export default function LoginForm() {
               helperText={touched.phone && errors.phone}
             />
             <TextField
-              label="Пароль"
+              label={t("password")}
               variant="outlined"
               name="password"
               type="password"
@@ -59,12 +60,16 @@ export default function LoginForm() {
               error={Boolean(touched.password && errors.password)}
               helperText={touched.password && errors.password}
             />
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="space-between">
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              justifyContent="space-between"
+            >
               <Button type="submit" color="inherit" variant="text" fullWidth>
-                Увійти
+                {t("submit")}
               </Button>
               <Button variant="text" color="inherit" fullWidth>
-                Забули пароль?
+                {t("forgot")}
               </Button>
             </Stack>
           </Stack>
