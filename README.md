@@ -1,171 +1,237 @@
-# 🍕 Pizza House — Client
+# Pizza House — Client
 
-> Next.js 15 storefront for Pizza House. Server-first architecture, ISR caching, fully typed.
+Next.js 16 storefront. Server-first архітектура, i18n (uk/en/ru), JWT авторизація, ISR кешування.
 
 ---
 
 ## Tech Stack
 
-| Layer | Choice | Why |
-|---|---|---|
-| Framework | Next.js 15 (App Router) | Server Components, ISR, `generateStaticParams` |
-| UI | MUI v7 + Tailwind CSS | Component library + utility classes |
-| State | Zustand + Immer | Lightweight cart state with structural sharing |
-| Forms | Formik + Yup | Login form validation |
-| Carousel | react-slick | Promo banner slider |
-| Language | TypeScript (strict) | Full type safety across the codebase |
+| | |
+|---|---|
+| Framework | Next.js 16 (App Router) |
+| UI | MUI v7 + Tailwind CSS |
+| State | Zustand 5 + Immer (cart + auth) |
+| i18n | next-intl (uk / en / ru) — cookie-based |
+| Forms | Formik + Yup |
+| Шрифт | Nunito (Google Fonts)
+| Карусель | react-slick |
+| Language | TypeScript (strict) |
 
 ---
 
-## Getting Started
-
-### 1. Clone & install
+## Старт
 
 ```bash
-git clone https://github.com/your-org/pizza-house-client.git
+git clone <repo>
 cd pizza-house-client
-pnpm install
-```
 
-### 2. Configure environment
-
-```bash
 cp .env.example .env.local
+# заповни API_URL
+
+pnpm install
+pnpm dev
 ```
 
-Open `.env.local` and set your API URL:
+Відкрий `http://localhost:3000`
 
-```env
-API_URL=https://your-backend.com
-NEXT_PUBLIC_API_URL=https://your-backend.com
-```
+---
 
-> `API_URL` is server-only and never sent to the browser.  
-> `NEXT_PUBLIC_API_URL` is available client-side if needed.
+## Environment Variables
 
-### 3. Run
+| Змінна | Де використовується | Опис |
+|---|---|---|
+| `API_URL` | Server Components, `lib/auth.ts`, `lib/orders.ts` | URL бекенду. `/api` prefix додається автоматично |
+| `NEXT_PUBLIC_API_URL` | Client Components | Публічний URL бекенду якщо відрізняється |
 
-```bash
-pnpm dev      # development (Turbopack)
-pnpm build    # production build
-pnpm start    # serve production build
-pnpm lint     # ESLint
-pnpm type-check  # TypeScript check without emitting
-```
+> `lib/api.ts` (`server-only`) автоматично додає `/api` до кожного запиту.
 
 ---
 
 ## Project Structure
 
 ```
-pizza-house-client/
 ├── app/
-│   ├── [pizzaId]/          # Product detail page (SSG via generateStaticParams)
-│   ├── category/[id]/      # Category page
-│   ├── entities/           # Feature-scoped UI components
-│   │   ├── basket/         # Cart item card
-│   │   ├── components/     # Shared primitives (Multiple counter, CardProduct)
-│   │   ├── header/         # Header sub-components (menu, select)
-│   │   ├── modal/          # Login form
-│   │   ├── pizza/          # Pizza card, variants, skeleton
-│   │   └── productId/      # Product page components (modifiers, price box)
-│   ├── providers/          # Zustand store context provider
-│   ├── stores/             # cartSlice, shop-store
-│   ├── widgets/            # Full-width layout sections (Header, Footer, Basket, Carousel)
-│   ├── layout.tsx          # Root layout — fonts, metadata, providers
-│   └── page.tsx            # Home page
+│   ├── layout.tsx                 # Root layout: шрифти, ThemeProvider, i18n, Header, Footer
+│   ├── page.tsx                   # Головна: каталог піц (Server Component)
+│   ├── [pizzaId]/page.tsx         # Сторінка продукту з breadcrumbs + модифікаторами
+│   ├── category/[id]/page.tsx     # Сторінка категорії
+│   ├── order/page.tsx             # Оформлення замовлення (Client Component)
+│   ├── my-orders/page.tsx         # Мої замовлення з polling статусу (Client Component)
+│   │
+│   ├── entities/                  # Feature-scoped компоненти
+│   │   ├── basket/card-basket.tsx
+│   │   ├── breadcrumbs/breadcrumbs.tsx
+│   │   ├── components/            # Shared: Multiple counter, CardProduct
+│   │   ├── header/                # LanguageSwitcher, HeaderMenu, HeaderSelect
+│   │   ├── modal/login-form.tsx   # Login + Register таби, реальний API call
+│   │   ├── pizza/                 # PizzaCard, ProductVariants, PizzaCardSkeleton
+│   │   └── productId/             # ModifiersCheckboxList, ModifiersMultiple, PriceBox...
+│   │
+│   ├── providers/
+│   │   ├── store-provider.tsx     # Zustand store context (SSR-safe: useRef pattern)
+│   │   └── theme-provider.tsx     # MUI ThemeProvider (окремий "use client" компонент)
+│   │
+│   ├── stores/
+│   │   ├── cartSlice.ts           # Кошик: add/remove/clear, modifiers, totals
+│   │   ├── authSlice.ts           # Auth: user, token, isAuthenticated
+│   │   └── shop-store.ts          # Об'єднаний store: cart + auth, persist у localStorage
+│   │
+│   ├── widgets/                   # Повноширинні секції
+│   │   ├── header.tsx             # Fixed AppBar + sticky category strip
+│   │   ├── basket.tsx             # Cart dropdown/drawer → посилання на /order
+│   │   ├── footer.tsx
+│   │   ├── carousel.tsx
+│   │   ├── categories.tsx
+│   │   └── modal-popup.tsx        # Login/Profile modal з "Мої замовлення"
+│   │
+│   ├── config.ts                  # API_URL з env
+│   ├── globals.css                # Tailwind base + бежевий фон #f5f0e8
+│   └── theme.ts                   # MUI theme: Nunito, beige background, rounded cards
+│
+├── i18n/
+│   ├── config.ts                  # Locales: ['uk', 'en', 'ru'], defaultLocale: 'uk'
+│   └── request.ts                 # Server-side: читає cookie 'locale'
+│
 ├── lib/
-│   └── api.ts              # Centralized fetch layer (server-only)
-├── types/
-│   └── product.ts          # Shared domain types
-├── public/                 # Static assets
-├── .env.example            # Environment variable template
-└── next.config.ts
+│   ├── api.ts                     # server-only: apiFetch з ISR revalidate
+│   ├── auth.ts                    # Client: loginRequest, registerRequest, getProfileRequest
+│   └── orders.ts                  # Client: createOrder, getMyOrders, cartToOrderItems
+│
+├── messages/
+│   ├── uk.json                    # Українська (default)
+│   ├── en.json                    # English
+│   └── ru.json                    # Русский
+│
+└── types/
+    └── product.ts                 # Product, Pizza, Category, Modifier, GroupModifier...
 ```
+
+---
+
+## Pages
+
+| URL | Тип | Auth | Опис |
+|---|---|---|---|
+| `/` | Server | Public | Каталог піц із карусель |
+| `/[pizzaId]` | Server | Public | Сторінка продукту + модифікатори |
+| `/category/[id]` | Server | Public | Продукти категорії |
+| `/order` | Client | Optional | Оформлення замовлення |
+| `/my-orders` | Client | Required | Мої замовлення з polling |
 
 ---
 
 ## Architecture Decisions
 
-### Data fetching
+### Data fetching — Server Components by default
 
-All data fetching happens in **Server Components** via `lib/api.ts`. There are no intermediate Next.js API routes — they added an extra network hop with no benefit.
+Всі дані завантажуються в Server Components через `lib/api.ts` (`server-only`). Немає зайвих проміжних API routes — прямий fetch з кешуванням ISR.
 
-```
-Browser → Next.js Server Component → External API
-```
-
-Caching strategy per resource:
-
-| Resource | `revalidate` | Reasoning |
+| Ресурс | `revalidate` | Пояснення |
 |---|---|---|
-| Pizza list | 60s | Changes occasionally during the day |
-| Categories | 3600s | Rarely changes |
-| Product detail | 300s | Stable, but may update |
+| Список піц | 60 сек | Змінюється відносно рідко |
+| Категорії | 3600 сек | Майже не змінюються |
+| Продукт по ID | 300 сек | Стабільний, але може оновлюватись |
 
-### Static generation
+### Категорії в `layout.tsx` — один fetch на всі сторінки
 
-Product pages are pre-rendered at build time via `generateStaticParams`. This means every `/[pizzaId]` page is served as static HTML — zero server work per request.
+`getCategories()` викликається в `RootLayout` і передається в `<Header categories={...}>`. Так категорії завантажуються один раз на рівні layout, а не окремо на кожній сторінці.
 
-```ts
-export async function generateStaticParams() {
-  const pizzas = await getPizzas();
-  return pizzas.flatMap((pizza) =>
-    pizza.products.map((p) => ({ pizzaId: p._id.toString() }))
-  );
-}
-```
+### ISR + `generateStaticParams`
 
-### Cart state
+Сторінки продуктів (`/[pizzaId]`) pre-render під час build через `generateStaticParams`. Кожна сторінка піци — статичний HTML, що завантажується миттєво.
 
-Cart lives in Zustand with Immer for mutation ergonomics and `persist` middleware for `localStorage`. The store is instantiated once per browser session and injected via React Context to avoid cross-request state leakage in SSR.
+### Zustand Store — SSR-safe патерн
+
+Store створюється через `useRef` в `ShopStoreProvider` — новий інстанс на кожен server request, один і той самий на клієнті. Запобігає cross-request state leakage.
 
 ```ts
-// store is created fresh per request on the server,
-// and reused across renders on the client
 const storeRef = useRef<ShopStoreApi | null>(null);
 if (storeRef.current === null) {
   storeRef.current = createShopStore();
 }
 ```
 
+### Cart + Auth persist у localStorage
+
+`zustand/persist` зберігає cart і auth token між сесіями. `partialize` визначає що саме зберігати — тільки необхідне, без UI стану.
+
+### Order — Snapshot підхід
+
+`cartToOrderItems()` в `lib/orders.ts` конвертує cart items у snapshot перед відправкою. Бекенд зберігає назву, ціну, модифікатори на момент замовлення — не ref. Якщо ціна зміниться завтра, стара histórica залишається коректною.
+
+### i18n — cookie-based без URL prefix
+
+Локаль зберігається в cookie `locale`. `i18n/request.ts` читає її server-side. Перемикання мови: `LanguageSwitcher` пише cookie → `router.refresh()` → Server Components перерендеряться з новою локаллю. Без `/uk/`, `/en/` в URL.
+
+### Polling замість WebSocket
+
+`/my-orders` оновлює статуси замовлень кожні 30 секунд через `setInterval`. Простіше WebSocket, достатньо для відстеження статусу піци. Cleanup через `clearInterval` в `useEffect` return.
+
+### `ThemeProvider` — окремий `"use client"` компонент
+
+MUI `ThemeProvider` використовує React Context — тільки client-side. Виноситься в `providers/theme-provider.tsx` щоб `layout.tsx` залишався Server Component і уникнути hydration mismatch.
+
 ---
 
-## Environment Variables
+## i18n
 
-| Variable | Required | Used in | Description |
-|---|---|---|---|
-| `API_URL` | ✅ | Server only | Backend base URL |
-| `NEXT_PUBLIC_API_URL` | Optional | Client | Public-facing API URL if different |
+Підтримувані мови: **Ukrainian** (default), **English**, **Russian**.
+
+Файли перекладів: `messages/{uk,en,ru}.json`
+
+Структура ключів:
+```
+header.*       — хедер, кнопки навігації
+basket.*       — кошик
+login.*        — форма входу / реєстрації
+product.*      — картка продукту, кнопки
+order.*        — сторінка оформлення
+myOrders.*     — сторінка "Мої замовлення"
+orderStatuses.*— статуси замовлень
+category.*     — сторінка категорії
+footer.nav.*   — посилання в футері
+breadcrumbs.*  — хлібні крихти
+carousel.*     — alt тексти слайдів
+```
+
+Щоб додати нову мову:
+1. Додай `"pl"` в `i18n/config.ts` → `locales`
+2. Створи `messages/pl.json` (скопіюй `en.json` і переклади)
+3. Додай `"pl": "POL"` в `localeLabels`
 
 ---
 
 ## Key Conventions
 
-- **No `any`** — all API responses and component props are typed via `types/product.ts`
-- **No bare `<img>`** — always use `next/image` for automatic optimization and lazy loading
-- **Stable `key` props** — lists always use entity IDs (`cartItemId`, `_id`), never array index
-- **MUI overrides via `sx`** — never target internal MUI class names (`.css-xxxx-MuiPaper...`) in global CSS; they change across versions
-- **Scroll listeners throttled** via `requestAnimationFrame` — never raw `addEventListener("scroll", fn)`
-- **Secrets in env** — API URLs and credentials live in `.env.local`, never in source
+- **Ніяких `any`** — всі типи в `types/product.ts`
+- **Тільки `next/image`** — ніяких bare `<img>`; завжди з `sizes` атрибутом
+- **Стабільні `key` props** — `cartItemId`, `_id`, ніколи array index
+- **MUI overrides через `sx`** — ніяких `.css-xxxx-MuiPaper...` в globals.css
+- **Scroll listener** — через `requestAnimationFrame`, не raw event
+- **`"use client"` тільки коли потрібно** — browser API або interactivity
+
+---
+
+## Scripts
+
+```bash
+pnpm dev          # Turbopack dev server
+pnpm build        # Production build
+pnpm start        # Serve production build
+pnpm lint         # ESLint
+pnpm type-check   # TypeScript без emit
+```
 
 ---
 
 ## Contributing
 
 ```bash
-# Before opening a PR:
 pnpm lint
 pnpm type-check
 ```
 
 1. Branch off `main`
-2. Keep commits atomic and descriptive
-3. No `any` types — if you're reaching for `any`, define the type instead
-4. Server Components by default — only add `"use client"` when you need browser APIs or interactivity
-
----
-
-## License
-
-Private. All rights reserved.
+2. Server Component за замовчуванням — `"use client"` тільки якщо є реальна причина
+3. Нові тексти — тільки через `useTranslations` / `getTranslations`, ніяких хардкодованих рядків
+4. Нові сторінки — додай breadcrumbs і metadata
