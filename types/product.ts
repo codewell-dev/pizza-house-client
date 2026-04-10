@@ -12,13 +12,16 @@ export interface Modifier {
   price: number;
   weight?: string;
   count?: number;
+  is_active?: boolean;
 }
 
 export interface GroupModifier {
   _id: string;
   title: string;
-  type: "select_one" | "select_many";
+  type: "select_one" | "select_many" | "multiple";
   modifiers: Modifier[];
+  min_quantity?: number;
+  max_quantity?: number;
 }
 
 export interface Product {
