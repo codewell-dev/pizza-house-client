@@ -11,13 +11,13 @@ export const createShopStore = () =>
     immer(
       devtools(
         persist(
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           (set, get, api) => ({
-            ...createCartSlice(set, get, api),
-            ...createAuthSlice(set, get, api),
+            ...createCartSlice(set as any, get, api as any),
+            ...createAuthSlice(set as any, get, api as any),
           }),
           {
             name: "shop-storage",
-            // Only persist cart and auth token — not UI state
             partialize: (state) => ({
               cart: state.cart,
               totalCount: state.totalCount,
