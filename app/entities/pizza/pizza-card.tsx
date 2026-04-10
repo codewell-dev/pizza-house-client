@@ -83,7 +83,7 @@ export default function PizzaCard({ title, products }: PizzaCardProps) {
           }}
         >
           <Image
-            src={`https://pizzahouse.ua/${currentProduct.image.large}`}
+            src={`https://pizzahouse.ua${currentProduct.image.large}`}
             alt={title}
             fill
             sizes="(max-width: 600px) 100vw, (max-width: 960px) 50vw, 25vw"
