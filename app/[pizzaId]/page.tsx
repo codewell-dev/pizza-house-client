@@ -137,7 +137,7 @@ export default async function ProductPage({ params }: PageProps) {
                     modifiers={mod.modifiers}
                     groupId={mod._id}
                   />
-                ) : mod.type === "select_many" ? (
+                ) : mod.type === "select_many" || mod.type === "multiple" ? (
                   <ModifiersMultiple key={mod._id} group={mod} />
                 ) : null
               )}

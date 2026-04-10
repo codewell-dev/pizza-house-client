@@ -179,7 +179,7 @@ export default function Header({
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/category/${cat.url}`}
+                href={`/`}
                 style={{ textDecoration: "none", flexShrink: 0 }}
               >
                 <Box
@@ -289,7 +289,7 @@ export default function Header({
           {categories.map((cat) => (
             <React.Fragment key={cat.id}>
               <Link
-                href={`/category/${cat.url}`}
+                href={`/`}
                 style={{ textDecoration: "none" }}
                 onClick={() => setDrawerOpen(false)}
               >

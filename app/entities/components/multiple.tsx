@@ -11,6 +11,7 @@ interface Props {
   countProduct: number;
   plusCount: () => void;
   minusCount: () => void;
+  disablePlus?: boolean;
 }
 
 const btnStyle = {
@@ -19,17 +20,39 @@ const btnStyle = {
   "&:hover": { backgroundColor: yellow[700] },
 };
 
-export default function Multiple({ reverse, countProduct, plusCount, minusCount }: Props) {
+const btnDisabledStyle = {
+  backgroundColor: "rgba(0,0,0,0.12)",
+  color: "rgba(0,0,0,0.26)",
+};
+
+export default function Multiple({
+  reverse,
+  countProduct,
+  plusCount,
+  minusCount,
+  disablePlus,
+}: Props) {
   return (
     <Box
       sx={{ display: "flex", alignItems: "center", gap: 1 }}
       flexDirection={reverse ? "column-reverse" : "row"}
     >
-      <IconButton aria-label="Зменшити кількість" size="small" sx={btnStyle} onClick={minusCount}>
+      <IconButton
+        aria-label="Зменшити кількість"
+        size="small"
+        sx={btnStyle}
+        onClick={minusCount}
+      >
         <RemoveIcon fontSize="inherit" />
       </IconButton>
       <Typography component="span">{countProduct}</Typography>
-      <IconButton aria-label="Збільшити кількість" size="small" sx={btnStyle} onClick={plusCount}>
+      <IconButton
+        aria-label="Збільшити кількість"
+        size="small"
+        disabled={disablePlus}
+        sx={disablePlus ? btnDisabledStyle : btnStyle}
+        onClick={plusCount}
+      >
         <AddIcon fontSize="inherit" />
       </IconButton>
     </Box>
