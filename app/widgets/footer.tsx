@@ -100,13 +100,20 @@ export default function Footer() {
 
         <Divider sx={{ my: 3 }} />
 
-        <Typography
-          variant="body2"
-          color={grey[600]}
-          textAlign="center"
-          fontSize={13}
-        >
+        <Typography variant="body2" color={grey[600]} textAlign="center" fontSize={13}>
           {t("copyright")}
+        </Typography>
+
+        <Typography variant="body2" color={grey[400]} textAlign="center" fontSize={12} mt={1}>
+          Розроблено{" "}
+          <a
+            href="https://github.com/codewell-dev"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: "inherit", fontWeight: 600, textDecoration: "none" }}
+          >
+            codewell-dev
+          </a>
         </Typography>
       </Container>
     </Box>

@@ -14,13 +14,53 @@ import { ShopStoreProvider } from "./providers/store-provider";
 import { getCategories } from "@/lib/api";
 import type { Locale } from "@/i18n/config";
 
+const BASE_URL = "https://pizza-house-client-ochre.vercel.app";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "Pizza House — замовити піцу онлайн",
     template: "%s | Pizza House",
   },
   description:
-    "Замовляйте смачну піцу та суші онлайн з доставкою. Pizza House — швидко, свіжо, смачно.",
+    "Замовляйте смачну піцу та суші онлайн з доставкою. Pizza House — швидко, свіжо, смачно. Піца, роли, закуски з доставкою додому.",
+  keywords: ["піца", "замовити піцу", "доставка піци", "pizza house", "суші", "роли", "їжа з доставкою"],
+  authors: [{ name: "codewell-dev", url: "https://github.com/codewell-dev" }],
+  creator: "codewell-dev",
+  openGraph: {
+    type: "website",
+    locale: "uk_UA",
+    url: BASE_URL,
+    siteName: "Pizza House",
+    title: "Pizza House — замовити піцу онлайн",
+    description: "Замовляйте смачну піцу та суші онлайн з доставкою.",
+    images: [
+      {
+        url: "https://pizzahouse.ua/_next/static/media/logo.0053162d.svg",
+        width: 400,
+        height: 400,
+        alt: "Pizza House",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pizza House — замовити піцу онлайн",
+    description: "Замовляйте смачну піцу та суші онлайн з доставкою.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: BASE_URL,
+  },
 };
 
 export default async function RootLayout({
@@ -34,14 +74,14 @@ export default async function RootLayout({
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <link rel="preconnect" href="https://pizzahouse.ua" />
+      </head>
       <body suppressHydrationWarning>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppThemeProvider>
             <ShopStoreProvider>
-              <Header
-                categories={categories}
-                currentLocale={locale as Locale}
-              />
+              <Header categories={categories} currentLocale={locale as Locale} />
               <main>{children}</main>
               <Footer />
             </ShopStoreProvider>

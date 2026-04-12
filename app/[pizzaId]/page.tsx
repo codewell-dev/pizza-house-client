@@ -7,6 +7,7 @@ import RelatedProducts from "../entities/productId/related-products";
 import ModifiersMultiple from "../entities/productId/modifiers-multiple";
 import ModifiersList from "../entities/productId/modifiers-list";
 import Breadcrumbs from "../entities/breadcrumbs/breadcrumbs";
+import ProductVariantSwitcher from "../entities/productId/product-variant-switcher";
 import { getPizzaById, getPizzas } from "@/lib/api";
 import { GroupModifier } from "@/types/product";
 import { notFound } from "next/navigation";
@@ -33,7 +34,25 @@ export async function generateMetadata({
   try {
     const { pizzaId } = await params;
     const product = await getPizzaById(pizzaId);
-    return { title: product.title, description: product.description };
+    const imageUrl = `https://pizzahouse.ua${product.image.large}`;
+    return {
+      title: product.title,
+      description: product.description,
+      openGraph: {
+        title: product.title,
+        description: product.description,
+        images: [
+          { url: imageUrl, width: 800, height: 800, alt: product.title },
+        ],
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: product.title,
+        description: product.description,
+        images: [imageUrl],
+      },
+    };
   } catch {
     return { title: "Продукт не знайдено" };
   }
@@ -60,7 +79,6 @@ export default async function ProductPage({ params }: PageProps) {
       maxWidth="xl"
       sx={{ py: { xs: 2, md: 4 }, px: { xs: 2, sm: 3, md: 4 } }}
     >
-      {/* Breadcrumbs: Головна / Піца / {product.title} */}
       <Breadcrumbs
         crumbs={[
           { label: tb("home"), href: "/" },
@@ -107,6 +125,9 @@ export default async function ProductPage({ params }: PageProps) {
             {product.title}
           </Typography>
 
+          {/* Варіації розміру — клієнтський компонент, отримує всі варіанти */}
+          <ProductVariantSwitcher currentProductId={pizzaId} />
+
           <Typography variant="h6" color="text.secondary" gutterBottom>
             {product.weight} {t("weight")}
           </Typography>
@@ -146,9 +167,14 @@ export default async function ProductPage({ params }: PageProps) {
         </Grid>
       </Grid>
 
-      <Box sx={{ mt: { xs: 6, md: 12 } }}>
-        <RelatedProducts products={product.well_together_products ?? []} />
-      </Box>
+      {/* Часто замовляють з */}
+      {(product.well_together_products ?? []).length > 0 && (
+        <Box sx={{ mt: { xs: 6, md: 10 } }}>
+          <RelatedProducts
+            products={(product.well_together_products ?? []).slice(0, 3)}
+          />
+        </Box>
+      )}
     </Container>
   );
 }

@@ -11,16 +11,25 @@ export default async function RelatedProducts({ products }: Props) {
   if (!products?.length) return null;
   const t = await getTranslations("product");
 
+  // Показуємо тільки 3 продукти
+  const visible = products.slice(0, 3);
+
   return (
-    <>
-      <Typography variant="h4" mt={5}>
+    <Box>
+      <Typography variant="h5" fontWeight={700} mb={2}>
         {t("relatedTitle")}
       </Typography>
-      <Box display="flex" gap={5} mt={2} flexWrap="wrap">
-        {products.map((product) => (
+      <Box
+        sx={{
+          display: "flex",
+          gap: 2,
+          flexWrap: { xs: "wrap", sm: "nowrap" },
+        }}
+      >
+        {visible.map((product) => (
           <CardRelated key={product.id ?? product._id} product={product} />
         ))}
       </Box>
-    </>
+    </Box>
   );
 }
