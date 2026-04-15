@@ -28,7 +28,7 @@ export default function CardProduct({ product }: Props) {
       <Card sx={{ width: "100%", height: "100%" }}>
         <Box sx={{ position: "relative", width: "100%", height: 200 }}>
           <Image
-            src={`https://pizzahouse.ua/${product.image.large}`}
+            src={`https://pizzahouse.ua/${product.image?.large}`}
             alt={product.title}
             fill
             sizes="(max-width: 600px) 100vw, 33vw"

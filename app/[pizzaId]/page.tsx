@@ -9,7 +9,7 @@ import ModifiersList from "../entities/productId/modifiers-list";
 import Breadcrumbs from "../entities/breadcrumbs/breadcrumbs";
 import ProductVariantSwitcher from "../entities/productId/product-variant-switcher";
 import { getPizzaById, getPizzas } from "@/lib/api";
-import { GroupModifier } from "@/types/product";
+import { GroupModifier, Product } from "@/types/product";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
@@ -60,13 +60,24 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: PageProps) {
   const { pizzaId } = await params;
-  const [product, t, tb] = await Promise.all([
+  // Паралельно отримуємо продукт, всі піци (для варіантів розміру) і переклади
+  const [product, pizzas, t, tb] = await Promise.all([
     getPizzaById(pizzaId),
+    getPizzas(),
     getTranslations("product"),
     getTranslations("breadcrumbs"),
   ]);
 
   if (!product) notFound();
+
+  // Знаходимо групу варіантів цієї піци (різні розміри одного продукту)
+  const pizzaGroup = pizzas.find((p) =>
+    p.products.some((prod) => prod._id === pizzaId)
+  );
+  const variants: Product[] = pizzaGroup?.products ?? [];
+
+  // Схожі продукти — перші 3 з well_together_products
+  const relatedProducts = (pizzas ?? pizzas).slice(0, 3);
 
   const sortedModifiers = [...(product.group_modifiers ?? [])].sort((a, b) => {
     if (a.type === "select_one" && b.type !== "select_one") return -1;
@@ -94,6 +105,7 @@ export default async function ProductPage({ params }: PageProps) {
         justifyContent="center"
         sx={{ mt: 1 }}
       >
+        {/* Зображення */}
         <Grid size={{ xs: 12, md: 6 }} className="flex justify-center">
           <Box
             sx={{
@@ -115,6 +127,7 @@ export default async function ProductPage({ params }: PageProps) {
           </Box>
         </Grid>
 
+        {/* Інфо */}
         <Grid size={{ xs: 12, md: 6 }} sx={{ maxWidth: "500px" }}>
           <Typography
             variant="h4"
@@ -125,8 +138,11 @@ export default async function ProductPage({ params }: PageProps) {
             {product.title}
           </Typography>
 
-          {/* Варіації розміру — клієнтський компонент, отримує всі варіанти */}
-          <ProductVariantSwitcher currentProductId={pizzaId} />
+          {/* Варіанти розміру — як на головному меню (850г / 1350г) */}
+          <ProductVariantSwitcher
+            currentProductId={pizzaId}
+            variants={variants}
+          />
 
           <Typography variant="h6" color="text.secondary" gutterBottom>
             {product.weight} {t("weight")}
@@ -166,15 +182,6 @@ export default async function ProductPage({ params }: PageProps) {
           )}
         </Grid>
       </Grid>
-
-      {/* Часто замовляють з */}
-      {(product.well_together_products ?? []).length > 0 && (
-        <Box sx={{ mt: { xs: 6, md: 10 } }}>
-          <RelatedProducts
-            products={(product.well_together_products ?? []).slice(0, 3)}
-          />
-        </Box>
-      )}
     </Container>
   );
 }

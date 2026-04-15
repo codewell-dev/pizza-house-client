@@ -33,7 +33,10 @@ interface HeaderProps {
   currentLocale: Locale;
 }
 
-export default function Header({ categories = [], currentLocale }: HeaderProps) {
+export default function Header({
+  categories = [],
+  currentLocale,
+}: HeaderProps) {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
   const [elevated, setElevated] = React.useState(false);
   const t = useTranslations("header");
@@ -55,7 +58,11 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
 
   return (
     <>
-      <AppBar position="fixed" elevation={elevated ? 4 : 0} sx={{ bgcolor: "#FAE900", zIndex: 1200 }}>
+      <AppBar
+        position="fixed"
+        elevation={elevated ? 4 : 0}
+        sx={{ bgcolor: "#FAE900", zIndex: 1200 }}
+      >
         <Container maxWidth="xl">
           <Toolbar
             disableGutters
@@ -66,20 +73,39 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
               minHeight: { xs: "56px", md: "64px" },
             }}
           >
-            <Box sx={{ display: "flex", alignItems: "center", gap: { xs: 1, md: 2 } }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: { xs: 1, md: 2 },
+              }}
+            >
               <Link href="/" aria-label="На головну">
                 <Image
                   src="https://pizzahouse.ua/_next/static/media/logo.0053162d.svg"
-                  width={50} height={50} alt="Pizza House"
-                  style={{ height: "auto" }} priority
+                  width={50}
+                  height={50}
+                  alt="Pizza House"
+                  style={{ height: "auto" }}
+                  priority
                 />
               </Link>
               {/* CSS-based visibility — no hydration flash */}
               <Box sx={{ display: { xs: "none", md: "block" } }}>
                 <Button
-                  variant="contained" color="secondary" size="small"
+                  variant="contained"
+                  color="secondary"
+                  size="small"
                   startIcon={<LocalOfferIcon sx={{ fontSize: 15 }} />}
-                  sx={{ borderRadius: 2, fontWeight: 700, fontSize: 13, px: 2, textTransform: "none", boxShadow: "none", "&:hover": { boxShadow: "none" } }}
+                  sx={{
+                    borderRadius: 2,
+                    fontWeight: 700,
+                    fontSize: 13,
+                    px: 2,
+                    textTransform: "none",
+                    boxShadow: "none",
+                    "&:hover": { boxShadow: "none" },
+                  }}
                 >
                   {t("promotions")}
                 </Button>
@@ -87,17 +113,36 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
             </Box>
 
             {/* Desktop nav */}
-            <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.5 }}>
+            <Box
+              sx={{
+                display: { xs: "none", md: "flex" },
+                alignItems: "center",
+                gap: 0.5,
+              }}
+            >
               <LanguageSwitcher currentLocale={currentLocale} />
-              <HeaderSelect title={t("phone")} links={["38000000000", "18000000000"]} />
+              <HeaderSelect
+                title={t("phone")}
+                links={["38000000000", "18000000000"]}
+              />
               <ModalPopup />
               <Basket />
             </Box>
 
             {/* Mobile nav */}
-            <Box sx={{ display: { xs: "flex", md: "none" }, alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                display: { xs: "flex", md: "none" },
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <Basket />
-              <IconButton color="inherit" onClick={() => setDrawerOpen(true)} aria-label="Відкрити меню">
+              <IconButton
+                color="inherit"
+                onClick={() => setDrawerOpen(true)}
+                aria-label="Відкрити меню"
+              >
                 <MenuIcon sx={{ fontSize: 28 }} />
               </IconButton>
             </Box>
@@ -120,25 +165,65 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
           }}
         >
           <Container maxWidth="xl" disableGutters>
-            <Box sx={{ display: "flex", overflowX: "auto", scrollbarWidth: "none", "&::-webkit-scrollbar": { display: "none" }, px: 2, py: "8px", gap: "4px" }}>
+            <Box
+              sx={{
+                display: "flex",
+                overflowX: "auto",
+                scrollbarWidth: "none",
+                "&::-webkit-scrollbar": { display: "none" },
+                px: 2,
+                py: "8px",
+                gap: "4px",
+              }}
+            >
               {categories.map((cat) => (
-                <Link key={cat.id} href="/" style={{ textDecoration: "none", flexShrink: 0 }}>
+                <Link
+                  key={cat._id}
+                  href={`/category/${cat._id}`}
+                  style={{ textDecoration: "none", flexShrink: 0 }}
+                >
                   <Box
                     sx={{
-                      display: "flex", flexDirection: "column", alignItems: "center",
-                      px: "10px", py: "6px", borderRadius: "10px",
-                      minWidth: 68, maxWidth: 80, cursor: "pointer",
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      px: "10px",
+                      py: "6px",
+                      borderRadius: "10px",
+                      minWidth: 68,
+                      maxWidth: 80,
+                      cursor: "pointer",
                       transition: "background 0.15s",
                       "&:hover": { bgcolor: "rgba(0,0,0,0.07)" },
                     }}
                   >
                     <Box sx={{ width: 36, height: 36, position: "relative" }}>
                       <Image
-                        src={cat.image.startsWith("http") ? cat.image : `https://pizzahouse.ua${cat.image}`}
-                        alt={cat.title} fill sizes="36px" style={{ objectFit: "contain" }}
+                        src={
+                          cat.image.startsWith("http")
+                            ? cat.image
+                            : `https://pizzahouse.ua${cat.image}`
+                        }
+                        alt={cat.title}
+                        fill
+                        sizes="36px"
+                        style={{ objectFit: "contain" }}
                       />
                     </Box>
-                    <Typography sx={{ fontSize: "11px", lineHeight: 1.25, mt: "5px", textAlign: "center", color: "#111", fontWeight: 500, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                    <Typography
+                      sx={{
+                        fontSize: "11px",
+                        lineHeight: 1.25,
+                        mt: "5px",
+                        textAlign: "center",
+                        color: "#111",
+                        fontWeight: 500,
+                        display: "-webkit-box",
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: "vertical",
+                        overflow: "hidden",
+                      }}
+                    >
                       {cat.title}
                     </Typography>
                   </Box>
@@ -151,16 +236,43 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
 
       {/* Mobile Drawer */}
       <Drawer
-        anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}
-        PaperProps={{ sx: { width: "100%", bgcolor: "white", display: "flex", flexDirection: "column" } }}
+        anchor="right"
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        PaperProps={{
+          sx: {
+            width: "100%",
+            bgcolor: "white",
+            display: "flex",
+            flexDirection: "column",
+          },
+        }}
       >
-        <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", px: 2, py: 1.5, borderBottom: "1px solid rgba(0,0,0,0.1)" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            px: 2,
+            py: 1.5,
+            borderBottom: "1px solid rgba(0,0,0,0.1)",
+          }}
+        >
           <Link href="/" onClick={() => setDrawerOpen(false)}>
-            <Image src="https://pizzahouse.ua/_next/static/media/logo.0053162d.svg" width={44} height={44} alt="Pizza House" style={{ height: "auto" }} />
+            <Image
+              src="https://pizzahouse.ua/_next/static/media/logo.0053162d.svg"
+              width={44}
+              height={44}
+              alt="Pizza House"
+              style={{ height: "auto" }}
+            />
           </Link>
           <Box display="flex" alignItems="center" gap={1}>
             <LanguageSwitcher currentLocale={currentLocale} />
-            <IconButton onClick={() => setDrawerOpen(false)} aria-label={t("close")}>
+            <IconButton
+              onClick={() => setDrawerOpen(false)}
+              aria-label={t("close")}
+            >
               <CloseIcon sx={{ fontSize: 28 }} />
             </IconButton>
           </Box>
@@ -169,15 +281,47 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
         <Box sx={{ flex: 1, overflowY: "auto", px: 2, py: 1 }}>
           {categories.map((cat) => (
             <React.Fragment key={cat.id}>
-              <Link href="/" style={{ textDecoration: "none" }} onClick={() => setDrawerOpen(false)}>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 2, py: "11px", px: 1, borderRadius: 2, "&:hover": { bgcolor: "rgba(0,0,0,0.06)" } }}>
-                  <Box sx={{ width: 40, height: 40, position: "relative", flexShrink: 0 }}>
+              <Link
+                href="/"
+                style={{ textDecoration: "none" }}
+                onClick={() => setDrawerOpen(false)}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    py: "11px",
+                    px: 1,
+                    borderRadius: 2,
+                    "&:hover": { bgcolor: "rgba(0,0,0,0.06)" },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      position: "relative",
+                      flexShrink: 0,
+                    }}
+                  >
                     <Image
-                      src={cat.image.startsWith("http") ? cat.image : `https://pizzahouse.ua${cat.image}`}
-                      alt={cat.title} fill sizes="40px" style={{ objectFit: "contain" }}
+                      src={
+                        cat.image.startsWith("http")
+                          ? cat.image
+                          : `https://pizzahouse.ua${cat.image}`
+                      }
+                      alt={cat.title}
+                      fill
+                      sizes="40px"
+                      style={{ objectFit: "contain" }}
                     />
                   </Box>
-                  <Typography sx={{ fontSize: 16, fontWeight: 500, color: "#111" }}>{cat.title}</Typography>
+                  <Typography
+                    sx={{ fontSize: 16, fontWeight: 500, color: "#111" }}
+                  >
+                    {cat.title}
+                  </Typography>
                 </Box>
               </Link>
               <Divider sx={{ opacity: 0.2 }} />
@@ -188,9 +332,15 @@ export default function Header({ categories = [], currentLocale }: HeaderProps) 
         <Box sx={{ px: 2, py: 2, borderTop: "1px solid rgba(0,0,0,0.1)" }}>
           <ModalPopup />
           <Box display="flex" gap={1} mt={1}>
-            <IconButton aria-label="Instagram" size="small"><InstagramIcon /></IconButton>
-            <IconButton aria-label="Facebook" size="small"><FacebookIcon /></IconButton>
-            <IconButton aria-label="Telegram" size="small"><TelegramIcon /></IconButton>
+            <IconButton aria-label="Instagram" size="small">
+              <InstagramIcon />
+            </IconButton>
+            <IconButton aria-label="Facebook" size="small">
+              <FacebookIcon />
+            </IconButton>
+            <IconButton aria-label="Telegram" size="small">
+              <TelegramIcon />
+            </IconButton>
           </Box>
         </Box>
       </Drawer>

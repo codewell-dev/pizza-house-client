@@ -9,12 +9,13 @@ interface Props {
   currentProductId: string;
 }
 
-// Кешуємо дані між переходами, щоб не робити повторний запит
 let cachedPizzas: Pizza[] | null = null;
 
 export default function ProductVariantSwitcher({ currentProductId }: Props) {
   const router = useRouter();
-  const [variants, setVariants] = useState<{ id: string; weight: string }[]>([]);
+  const [variants, setVariants] = useState<{ id: string; weight: string }[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,13 +65,21 @@ export default function ProductVariantSwitcher({ currentProductId }: Props) {
               py: 0.6,
               borderRadius: "8px",
               bgcolor: isActive ? "#FAE900" : "#f0ede5",
-              border: isActive ? "1.5px solid #d4c200" : "1.5px solid transparent",
+              border: isActive
+                ? "1.5px solid #d4c200"
+                : "1.5px solid transparent",
               transition: "all 0.15s",
               "&:hover": { bgcolor: isActive ? "#FAE900" : "#e8e4d8" },
               cursor: isActive ? "default" : "pointer",
             }}
           >
-            <Typography sx={{ fontSize: "0.82rem", fontWeight: isActive ? 700 : 500, color: "#333" }}>
+            <Typography
+              sx={{
+                fontSize: "0.82rem",
+                fontWeight: isActive ? 700 : 500,
+                color: "#333",
+              }}
+            >
               {v.weight} г
             </Typography>
           </ButtonBase>
