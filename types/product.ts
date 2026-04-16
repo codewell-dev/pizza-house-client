@@ -58,7 +58,7 @@ export interface RelatedProduct {
 }
 
 export interface Category {
-  id: number | string;
+  _id: number | string;
   title: string;
   url: string;
   image: string;

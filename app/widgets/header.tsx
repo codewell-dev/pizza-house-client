@@ -280,7 +280,7 @@ export default function Header({
 
         <Box sx={{ flex: 1, overflowY: "auto", px: 2, py: 1 }}>
           {categories.map((cat) => (
-            <React.Fragment key={cat.id}>
+            <React.Fragment key={cat._id}>
               <Link
                 href="/"
                 style={{ textDecoration: "none" }}
