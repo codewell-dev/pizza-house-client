@@ -2,49 +2,54 @@
 
 import { Box, ButtonBase, Typography, Skeleton } from "@mui/material";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Pizza } from "@/types/product";
 
 interface Props {
   currentProductId: string;
 }
 
-let cachedPizzas: Pizza[] | null = null;
+async function fetchPizzasGrouped(): Promise<Pizza[]> {
+  const res = await fetch("/api/pizzas-grouped");
+  if (!res.ok) throw new Error("Failed to fetch pizzas");
+  return res.json();
+}
 
+/**
+ * Product detail page size switcher.
+ *
+ * Uses TanStack Query instead of the previous module-level cached variable —
+ * that approach caused stale data across navigations and was an antipattern.
+ *
+ * Renders large pill buttons matching pizzahouse.ua: "30 см - 500г"
+ * The format uses the product's own weight field.
+ */
 export default function ProductVariantSwitcher({ currentProductId }: Props) {
   const router = useRouter();
-  const [variants, setVariants] = useState<{ id: string; weight: string }[]>(
-    []
+
+  const { data: pizzas, isLoading } = useQuery({
+    queryKey: ["pizzas-grouped"],
+    queryFn: fetchPizzasGrouped,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+
+  const pizzaGroup = pizzas?.find((p) =>
+    p.products.some((prod) => prod._id === currentProductId)
   );
-  const [loading, setLoading] = useState(true);
+  const variants = pizzaGroup?.products ?? [];
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        if (!cachedPizzas) {
-          const res = await fetch("/api/pizzas-grouped");
-          cachedPizzas = await res.json();
-        }
-        const pizza = cachedPizzas?.find((p) =>
-          p.products.some((prod) => prod._id === currentProductId)
-        );
-        if (pizza && pizza.products.length > 1) {
-          setVariants(
-            pizza.products.map((p) => ({ id: p._id, weight: p.weight }))
-          );
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    load();
-  }, [currentProductId]);
-
-  if (loading) {
+  if (isLoading) {
     return (
-      <Box sx={{ display: "flex", gap: 1, my: 1.5 }}>
+      <Box sx={{ display: "flex", gap: 1.5, my: 2, flexWrap: "wrap" }}>
         {[1, 2, 3].map((i) => (
-          <Skeleton key={i} variant="rounded" width={64} height={32} />
+          <Skeleton
+            key={i}
+            variant="rounded"
+            width={130}
+            height={48}
+            sx={{ borderRadius: "12px" }}
+          />
         ))}
       </Box>
     );
@@ -53,31 +58,38 @@ export default function ProductVariantSwitcher({ currentProductId }: Props) {
   if (variants.length <= 1) return null;
 
   return (
-    <Box sx={{ display: "flex", gap: "6px", flexWrap: "wrap", my: 1.5 }}>
+    <Box sx={{ display: "flex", gap: "10px", flexWrap: "wrap", my: 2 }}>
       {variants.map((v) => {
-        const isActive = v.id === currentProductId;
+        const isActive = v._id === currentProductId;
         return (
           <ButtonBase
-            key={v.id}
-            onClick={() => !isActive && router.push(`/${v.id}`)}
+            key={v._id}
+            onClick={() => !isActive && router.push(`/${v._id}`)}
+            disabled={isActive}
             sx={{
-              px: 1.5,
-              py: 0.6,
-              borderRadius: "8px",
-              bgcolor: isActive ? "#FAE900" : "#f0ede5",
-              border: isActive
-                ? "1.5px solid #d4c200"
-                : "1.5px solid transparent",
-              transition: "all 0.15s",
-              "&:hover": { bgcolor: isActive ? "#FAE900" : "#e8e4d8" },
+              px: 2.5,
+              py: 1.3,
+              borderRadius: "12px",
+              bgcolor: isActive ? "#FAE900" : "#f5f5f5",
+              border: isActive ? "2px solid #d4b800" : "2px solid transparent",
+              transition: "all 0.18s ease",
               cursor: isActive ? "default" : "pointer",
+              "&:hover:not(:disabled)": {
+                bgcolor: "#ebebeb",
+                transform: "translateY(-1px)",
+              },
+              boxShadow: isActive
+                ? "0 3px 10px rgba(212,184,0,0.3)"
+                : "0 1px 4px rgba(0,0,0,0.06)",
             }}
           >
             <Typography
               sx={{
-                fontSize: "0.82rem",
+                fontSize: { xs: "0.88rem", sm: "0.92rem" },
                 fontWeight: isActive ? 700 : 500,
-                color: "#333",
+                color: "#1a1a1a",
+                whiteSpace: "nowrap",
+                letterSpacing: "-0.01em",
               }}
             >
               {v.weight} г

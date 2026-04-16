@@ -5,194 +5,227 @@ import {
   Box,
   Stack,
   Typography,
-  Menu,
   Button,
   Divider,
   IconButton,
   Drawer,
-  useMediaQuery,
-  useTheme,
+  Badge,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import Link from "next/link";
 import CardBasket from "../entities/basket/card-basket";
 import { useShopStore } from "../providers/store-provider";
 import { ProductWithCartId } from "../stores/cartSlice";
 import { useTranslations } from "next-intl";
 
+/**
+ * Basket widget — redesigned to match pizzahouse.ua:
+ * - Yellow button with cart icon + count + price in header
+ * - Drawer from right (both mobile and desktop)
+ * - Items displayed with CardBasket (modifier tags, remove modifier)
+ * - Checkout CTA at the bottom
+ */
 export default function Basket() {
-  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+  const [open, setOpen] = React.useState(false);
   const t = useTranslations("basket");
-
-  const open = Boolean(anchorEl);
-
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (isMobile) setDrawerOpen(true);
-    else setAnchorEl(event.currentTarget);
-  };
-  const handleClose = () => {
-    setAnchorEl(null);
-    setDrawerOpen(false);
-  };
 
   const cartProducts = useShopStore((state) => state.cart);
   const totalPrice = useShopStore((state) => state.totalPrice);
   const totalCount = useShopStore((state) => state.totalCount);
 
   const BasketContent = (
-    <Stack
-      spacing={2}
+    <Box
       sx={{
+        width: { xs: "100vw", sm: 420 },
+        maxWidth: "100vw",
         height: "100%",
         display: "flex",
         flexDirection: "column",
-        justifyContent: "space-between",
+        bgcolor: "#fff",
       }}
     >
+      {/* Header */}
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          px: 2.5,
+          py: 2,
+          borderBottom: "1px solid rgba(0,0,0,0.08)",
+          flexShrink: 0,
+        }}
+      >
+        <Typography
+          sx={{ fontWeight: 700, fontSize: "1.2rem", color: "#1a1a1a" }}
+        >
+          {t("title")}
+        </Typography>
+        <IconButton
+          onClick={() => setOpen(false)}
+          size="small"
+          sx={{
+            bgcolor: "#f5f5f5",
+            "&:hover": { bgcolor: "#ebebeb" },
+            borderRadius: "8px",
+          }}
+        >
+          <CloseIcon sx={{ fontSize: 18 }} />
+        </IconButton>
+      </Box>
+
+      {/* Items list */}
       <Box
         sx={{
           flex: 1,
           overflowY: "auto",
-          display: "flex",
-          flexDirection: "column",
-          gap: 2,
-          pr: 1,
+          px: 2.5,
+          py: 1,
+          "&::-webkit-scrollbar": { width: 4 },
+          "&::-webkit-scrollbar-thumb": {
+            bgcolor: "#e0e0e0",
+            borderRadius: 2,
+          },
         }}
       >
         {cartProducts.length > 0 ? (
-          cartProducts.map((item: ProductWithCartId) => (
-            <CardBasket key={item.cartItemId} product={item} />
-          ))
+          <Stack>
+            {cartProducts.map((item: ProductWithCartId) => (
+              <CardBasket key={item.cartItemId} product={item} />
+            ))}
+          </Stack>
         ) : (
-          <Typography color="text.secondary" textAlign="center" mt={4}>
-            {t("empty")}
-          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              height: "100%",
+              gap: 2,
+              py: 8,
+              color: "#bbb",
+            }}
+          >
+            <ShoppingCartOutlinedIcon sx={{ fontSize: 56, color: "#e0e0e0" }} />
+            <Typography color="text.secondary" textAlign="center">
+              {t("empty")}
+            </Typography>
+          </Box>
         )}
       </Box>
 
-      <Divider sx={{ my: 2 }} />
-
-      <Box>
-        <Typography variant="body2" color="text.secondary" mb={1}>
-          {t("promo")}
-        </Typography>
-
-        {/* Checkout button → /order page */}
-        <Button
-          variant="contained"
-          fullWidth
-          size="large"
-          component={Link}
-          href="/order"
-          onClick={handleClose}
-          disabled={cartProducts.length === 0}
+      {/* Footer */}
+      {cartProducts.length > 0 && (
+        <Box
           sx={{
-            borderRadius: 3,
-            bgcolor: "#FAE900",
-            color: "#111",
-            fontWeight: 700,
-            "&:hover": { bgcolor: "#f5df00" },
+            flexShrink: 0,
+            px: 2.5,
+            py: 2,
+            borderTop: "1px solid rgba(0,0,0,0.08)",
           }}
         >
-          {t("checkout")}
-        </Button>
+          <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+            <Typography sx={{ fontWeight: 600, color: "#1a1a1a" }}>
+              {t("total")}:
+            </Typography>
+            <Typography
+              sx={{ fontWeight: 700, fontSize: "1.1rem", color: "#1a1a1a" }}
+            >
+              {totalPrice} ₴
+            </Typography>
+          </Box>
 
-        <Typography
-          variant="subtitle1"
-          textAlign="center"
-          fontWeight={600}
-          mt={1}
-        >
-          {t("total")}: {totalCount} {t("pieces")} · {totalPrice} ₴
-        </Typography>
-      </Box>
-    </Stack>
+          <Button
+            variant="contained"
+            fullWidth
+            size="large"
+            component={Link}
+            href="/order"
+            onClick={() => setOpen(false)}
+            sx={{
+              borderRadius: "12px",
+              bgcolor: "#FAE900",
+              color: "#111",
+              fontWeight: 700,
+              fontSize: "1rem",
+              py: 1.5,
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#f5df00", boxShadow: "none" },
+            }}
+          >
+            {t("checkout")}
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 
   return (
     <>
+      {/* Trigger button — matches pizzahouse.ua yellow pill */}
       <Button
-        id="basket-btn"
-        aria-controls={open ? "basket-menu" : undefined}
-        aria-haspopup="true"
-        aria-expanded={open ? "true" : undefined}
-        onClick={handleClick}
+        onClick={() => setOpen(true)}
+        variant="contained"
         sx={{
-          borderRadius: 5,
-          py: 0.7,
-          px: 2,
+          borderRadius: "50px",
+          py: 0.75,
+          px: { xs: 1.5, sm: 2 },
           display: "flex",
           alignItems: "center",
           gap: 1,
-          minWidth: isMobile ? 48 : "auto",
+          bgcolor: "#FAE900",
+          color: "#111",
+          fontWeight: 700,
+          fontSize: { xs: "0.82rem", sm: "0.88rem" },
+          boxShadow: "none",
+          "&:hover": { bgcolor: "#f5df00", boxShadow: "none" },
+          minWidth: "auto",
         }}
-        variant="contained"
-        color={cartProducts.length > 0 ? "secondary" : "warning"}
-        startIcon={<ShoppingCartIcon />}
       >
-        {isMobile
-          ? totalCount
-          : `${t("button")} | ${totalCount} | ${totalPrice} ₴`}
+        <Badge
+          badgeContent={totalCount}
+          sx={{
+            "& .MuiBadge-badge": {
+              bgcolor: "#111",
+              color: "#FAE900",
+              fontWeight: 700,
+              fontSize: "0.7rem",
+              minWidth: 18,
+              height: 18,
+            },
+          }}
+        >
+          <ShoppingCartOutlinedIcon sx={{ fontSize: 20 }} />
+        </Badge>
+        {totalCount > 0 && (
+          <Typography
+            component="span"
+            sx={{
+              fontSize: "inherit",
+              fontWeight: 700,
+              display: { xs: "none", sm: "inline" },
+            }}
+          >
+            {totalCount} | {totalPrice} ₴
+          </Typography>
+        )}
       </Button>
 
-      {!isMobile && (
-        <Menu
-          id="basket-menu"
-          anchorEl={anchorEl}
-          open={open}
-          onClose={handleClose}
-          MenuListProps={{ "aria-labelledby": "basket-btn" }}
-          sx={{ mt: 1 }}
-          PaperProps={{
-            sx: {
-              width: 400,
-              maxHeight: "90vh",
-              borderRadius: 2,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-            },
-          }}
-        >
-          {BasketContent}
-        </Menu>
-      )}
-
-      {isMobile && (
-        <Drawer
-          anchor="right"
-          open={drawerOpen}
-          onClose={handleClose}
-          PaperProps={{
-            sx: {
-              width: "100%",
-              maxWidth: 420,
-              p: 2,
-              display: "flex",
-              flexDirection: "column",
-            },
-          }}
-        >
-          <Box
-            display="flex"
-            justifyContent="space-between"
-            alignItems="center"
-            mb={2}
-          >
-            <Typography variant="h6" fontWeight={600}>
-              {t("title")}
-            </Typography>
-            <IconButton onClick={handleClose} aria-label={t("closeCart")}>
-              <CloseIcon />
-            </IconButton>
-          </Box>
-          {BasketContent}
-        </Drawer>
-      )}
+      <Drawer
+        anchor="right"
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          sx: {
+            width: { xs: "100vw", sm: 420 },
+            maxWidth: "100vw",
+          },
+        }}
+      >
+        {BasketContent}
+      </Drawer>
     </>
   );
 }

@@ -1,6 +1,5 @@
 import { StateCreator } from "zustand";
-import { Product } from "@/types/product";
-import { Modifier } from "@/types/product";
+import { Product, Modifier } from "@/types/product";
 
 type MyStore = CartSlice;
 
@@ -8,7 +7,10 @@ export interface ProductWithCartId extends Product {
   cartItemId: string;
   count: number;
   modifiers: Modifier[];
+  /** Per-unit price (base + modifiers). Multiply by count for line total. */
   price: number;
+  /** Base price without modifiers — stored for recalculation when modifiers change */
+  basePrice?: number;
 }
 
 export interface CartSlice {
@@ -23,6 +25,8 @@ export interface CartSlice {
 
   addProductToCart: (product: Product, cartItemId?: string) => void;
   removeProductFromCart: (cartItemId: string) => void;
+  /** Remove a specific modifier from a cart item and recalculate its price */
+  removeModifierFromCartItem: (cartItemId: string, modifierId: string) => void;
   clearCart: () => void;
 }
 
@@ -36,12 +40,12 @@ const isSameModifiers = (a: Modifier[] = [], b: Modifier[] = []): boolean => {
 const getModifiersPrice = (modifiers: Modifier[] = []): number =>
   modifiers.reduce((sum, mod) => sum + Number(mod.price ?? 0) * (mod.count ?? 1), 0);
 
-const getItemTotalPrice = (product: Product, modifiers: Modifier[]): number =>
-  Number(product.price ?? 0) + getModifiersPrice(modifiers);
-
 const recalcTotals = (cart: ProductWithCartId[]) => ({
   totalCount: cart.reduce((acc, item) => acc + (item.count ?? 1), 0),
-  totalPrice: cart.reduce((acc, item) => acc + (item.price ?? 0) * (item.count ?? 1), 0),
+  totalPrice: cart.reduce(
+    (acc, item) => acc + (item.price ?? 0) * (item.count ?? 1),
+    0
+  ),
 });
 
 export const createCartSlice: StateCreator<
@@ -91,29 +95,38 @@ export const createCartSlice: StateCreator<
   addProductToCart: (product) =>
     set(
       (state) => {
-        const currentModifiers: Modifier[] = JSON.parse(JSON.stringify(state.modifiers));
+        const currentModifiers: Modifier[] = JSON.parse(
+          JSON.stringify(state.modifiers)
+        );
+        const basePrice = Number(product.price ?? 0);
+        const unitPrice = basePrice + getModifiersPrice(currentModifiers);
 
-        if (product.cartItemId) {
-          const existing = state.cart.find((item) => item.cartItemId === product.cartItemId);
+        const cartItemId = (product as ProductWithCartId).cartItemId;
+
+        if (cartItemId) {
+          // Increment existing item (called from cart quantity controls)
+          const existing = state.cart.find((i) => i.cartItemId === cartItemId);
           if (existing) {
             existing.count++;
-            existing.price = getItemTotalPrice(product, existing.modifiers);
           }
         } else {
+          // Add new or merge with identical existing
           const existing = state.cart.find(
-            (item) => item._id === product._id && isSameModifiers(item.modifiers, currentModifiers)
+            (item) =>
+              item._id === product._id &&
+              isSameModifiers(item.modifiers, currentModifiers)
           );
 
           if (existing) {
             existing.count++;
-            existing.price = getItemTotalPrice(product, currentModifiers);
           } else {
             state.cart.push({
               ...product,
               cartItemId: crypto.randomUUID(),
               count: 1,
               modifiers: currentModifiers,
-              price: getItemTotalPrice(product, currentModifiers),
+              price: unitPrice,
+              basePrice,
             });
           }
         }
@@ -145,6 +158,27 @@ export const createCartSlice: StateCreator<
       },
       false,
       "cart/removeProduct"
+    ),
+
+  removeModifierFromCartItem: (cartItemId, modifierId) =>
+    set(
+      (state) => {
+        const item = state.cart.find((i) => i.cartItemId === cartItemId);
+        if (!item) return;
+
+        // Remove the modifier from the item's modifier list
+        item.modifiers = item.modifiers.filter((m) => m._id !== modifierId);
+
+        // Recalculate unit price: basePrice + remaining modifiers
+        const base = item.basePrice ?? Number(item.price ?? 0);
+        item.price = base + getModifiersPrice(item.modifiers);
+
+        const totals = recalcTotals(state.cart);
+        state.totalCount = totals.totalCount;
+        state.totalPrice = totals.totalPrice;
+      },
+      false,
+      "cart/removeModifierFromCartItem"
     ),
 
   clearCart: () =>

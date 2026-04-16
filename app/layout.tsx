@@ -8,6 +8,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import "./globals.css";
 import AppThemeProvider from "./providers/theme-provider";
+import QueryProvider from "./providers/query-provider";
 import Header from "./widgets/header";
 import Footer from "./widgets/footer";
 import { ShopStoreProvider } from "./providers/store-provider";
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   },
   description:
     "Замовляйте смачну піцу та суші онлайн з доставкою. Pizza House — швидко, свіжо, смачно. Піца, роли, закуски з доставкою додому.",
-  keywords: ["піца", "замовити піцу", "доставка піци", "pizza house", "суші", "роли", "їжа з доставкою"],
+  keywords: ["піца", "замовити піцу", "доставка піці", "pizza house", "суші", "роли", "їжа з доставкою"],
   authors: [{ name: "codewell-dev", url: "https://github.com/codewell-dev" }],
   creator: "codewell-dev",
   openGraph: {
@@ -81,9 +82,13 @@ export default async function RootLayout({
         <NextIntlClientProvider locale={locale} messages={messages}>
           <AppThemeProvider>
             <ShopStoreProvider>
-              <Header categories={categories} currentLocale={locale as Locale} />
-              <main>{children}</main>
-              <Footer />
+              {/* QueryProvider wraps only client components that need it.
+                  Placed inside ShopStoreProvider so queries can read cart state if needed. */}
+              <QueryProvider>
+                <Header categories={categories} currentLocale={locale as Locale} />
+                <main>{children}</main>
+                <Footer />
+              </QueryProvider>
             </ShopStoreProvider>
           </AppThemeProvider>
         </NextIntlClientProvider>
