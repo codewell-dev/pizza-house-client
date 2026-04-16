@@ -3,10 +3,11 @@
 import { Box, ButtonBase, Typography, Skeleton } from "@mui/material";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { Pizza } from "@/types/product";
+import { Pizza, Product } from "@/types/product";
 
 interface Props {
   currentProductId: string;
+  variants: Product[];
 }
 
 async function fetchPizzasGrouped(): Promise<Pizza[]> {
