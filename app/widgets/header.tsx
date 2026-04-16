@@ -282,7 +282,7 @@ export default function Header({
           {categories.map((cat) => (
             <React.Fragment key={cat._id}>
               <Link
-                href="/"
+                href={`/category/${cat._id}`}
                 style={{ textDecoration: "none" }}
                 onClick={() => setDrawerOpen(false)}
               >
