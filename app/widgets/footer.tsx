@@ -54,9 +54,21 @@ export default function Footer() {
   ];
 
   const SOCIAL = [
-    { icon: <InstagramIcon sx={{ fontSize: 20 }} />, label: "Instagram", href: "/" },
-    { icon: <FacebookIcon sx={{ fontSize: 20 }} />, label: "Facebook", href: "/" },
-    { icon: <TelegramIcon sx={{ fontSize: 20 }} />, label: "Telegram", href: "/" },
+    {
+      icon: <InstagramIcon sx={{ fontSize: 20 }} />,
+      label: "Instagram",
+      href: "/",
+    },
+    {
+      icon: <FacebookIcon sx={{ fontSize: 20 }} />,
+      label: "Facebook",
+      href: "/",
+    },
+    {
+      icon: <TelegramIcon sx={{ fontSize: 20 }} />,
+      label: "Telegram",
+      href: "/",
+    },
   ];
 
   const NavLink = ({ label, href }: { label: string; href: string }) => (
@@ -112,19 +124,30 @@ export default function Footer() {
                 mb: 2,
               }}
             >
-              Смачна піца та суші з доставкою у ваше місто. Швидко, свіжо, смачно.
+              Смачна піца та суші з доставкою у ваше місто. Швидко, свіжо,
+              смачно.
             </Typography>
 
             {/* Contact info */}
             <Stack spacing={1}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <PhoneIcon sx={{ fontSize: 15, color: "#8A8A85", flexShrink: 0 }} />
-                <Typography sx={{ fontSize: "0.85rem", fontWeight: 600, color: "#1A1A18" }}>
+                <PhoneIcon
+                  sx={{ fontSize: 15, color: "#8A8A85", flexShrink: 0 }}
+                />
+                <Typography
+                  sx={{
+                    fontSize: "0.85rem",
+                    fontWeight: 600,
+                    color: "#1A1A18",
+                  }}
+                >
                   0 800 000-000
                 </Typography>
               </Box>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                <AccessTimeIcon sx={{ fontSize: 15, color: "#8A8A85", flexShrink: 0 }} />
+                <AccessTimeIcon
+                  sx={{ fontSize: 15, color: "#8A8A85", flexShrink: 0 }}
+                />
                 <Typography sx={{ fontSize: "0.82rem", color: "#5A5A56" }}>
                   Щодня 10:00 – 23:00
                 </Typography>
@@ -175,7 +198,11 @@ export default function Footer() {
               <Box
                 component="a"
                 href="/"
-                sx={{ display: "inline-block", opacity: 0.85, "&:hover": { opacity: 1 } }}
+                sx={{
+                  display: "inline-block",
+                  opacity: 0.85,
+                  "&:hover": { opacity: 1 },
+                }}
               >
                 <Image
                   src="https://pizzahouse.ua/_next/static/media/google_play.6ba3105b.svg"
@@ -188,7 +215,11 @@ export default function Footer() {
               <Box
                 component="a"
                 href="/"
-                sx={{ display: "inline-block", opacity: 0.85, "&:hover": { opacity: 1 } }}
+                sx={{
+                  display: "inline-block",
+                  opacity: 0.85,
+                  "&:hover": { opacity: 1 },
+                }}
               >
                 <Image
                   src="https://pizzahouse.ua/_next/static/media/app_store.79c3e27c.svg"
@@ -196,6 +227,7 @@ export default function Footer() {
                   width={132}
                   height={40}
                   style={{ display: "block" }}
+                  data-scroll-behavior="smooth"
                 />
               </Box>
             </Stack>
@@ -238,7 +270,9 @@ export default function Footer() {
           </Grid>
         </Grid>
 
-        <Divider sx={{ my: { xs: 3, md: 4 }, borderColor: "rgba(26,26,24,0.08)" }} />
+        <Divider
+          sx={{ my: { xs: 3, md: 4 }, borderColor: "rgba(26,26,24,0.08)" }}
+        />
 
         {/* Bottom bar */}
         <Box

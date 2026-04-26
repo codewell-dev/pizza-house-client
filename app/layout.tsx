@@ -14,6 +14,7 @@ import Footer from "./widgets/footer";
 import { ShopStoreProvider } from "./providers/store-provider";
 import { getCategories } from "@/lib/api";
 import type { Locale } from "@/i18n/config";
+import ThemeRegistry from "./theme-registry";
 
 const BASE_URL = "https://pizza-house-client-ochre.vercel.app";
 
@@ -25,7 +26,15 @@ export const metadata: Metadata = {
   },
   description:
     "Замовляйте смачну піцу та суші онлайн з доставкою. Pizza House — швидко, свіжо, смачно. Піца, роли, закуски з доставкою додому.",
-  keywords: ["піца", "замовити піцу", "доставка піці", "pizza house", "суші", "роли", "їжа з доставкою"],
+  keywords: [
+    "піца",
+    "замовити піцу",
+    "доставка піці",
+    "pizza house",
+    "суші",
+    "роли",
+    "їжа з доставкою",
+  ],
   authors: [{ name: "codewell-dev", url: "https://github.com/codewell-dev" }],
   creator: "codewell-dev",
   openGraph: {
@@ -79,19 +88,22 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://pizzahouse.ua" />
       </head>
       <body suppressHydrationWarning>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <AppThemeProvider>
-            <ShopStoreProvider>
-              {/* QueryProvider wraps only client components that need it.
-                  Placed inside ShopStoreProvider so queries can read cart state if needed. */}
-              <QueryProvider>
-                <Header categories={categories} currentLocale={locale as Locale} />
-                <main>{children}</main>
-                <Footer />
-              </QueryProvider>
-            </ShopStoreProvider>
-          </AppThemeProvider>
-        </NextIntlClientProvider>
+        <ThemeRegistry>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <AppThemeProvider>
+              <ShopStoreProvider>
+                <QueryProvider>
+                  <Header
+                    categories={categories}
+                    currentLocale={locale as Locale}
+                  />
+                  <main>{children}</main>
+                  <Footer />
+                </QueryProvider>
+              </ShopStoreProvider>
+            </AppThemeProvider>
+          </NextIntlClientProvider>
+        </ThemeRegistry>
       </body>
     </html>
   );
